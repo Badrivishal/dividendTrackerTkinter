@@ -1,13 +1,9 @@
 import tkinter as tk
 from tkinter import filedialog as fd
-from tkinter import font as tkfont
 from tkinter import ttk
-
 from click import command
 from application import *
 from pageOne import *
-import pickle
-import app
 import DAO
 
 
@@ -15,24 +11,22 @@ class TransactionPage(tk.Frame):
 
     replen = 0
 
-    lbl = [['' for i in range(100)] for i in range(7)]
+    lbl = [['' for _ in range(100)] for _ in range(7)]
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        
 
-
-        lbl = tk.Label(self, text = "Transaction Mode")
-        lbl.grid(column = 0, row = 0, columnspan = 12)
+        transactionModeTitlelbl = tk.Label(self, text = "Transaction Mode")
+        transactionModeTitlelbl.grid(column = 0, row = 0, columnspan = 12)
         
-        button = tk.Button(self, text="Dividend Mode",
+        dividendModebutton = tk.Button(self, text="Dividend Mode",
                            command=lambda: controller.show_frame("PageOne"))
-        button.grid(column=9, row=1)
+        dividendModebutton.grid(column=9, row=1)
 
-        button = tk.Button(self, text="New Transaction",
+        newTransactionbutton = tk.Button(self, text="New Transaction",
                            command=lambda: controller.show_frame("NewTransaction"))
-        button.grid(column=8, row=1)
+        newTransactionbutton.grid(column=8, row=1)
 
         button = tk.Button(self, text="New Account",
                            command=lambda: controller.show_frame("NewAccount"))
@@ -67,9 +61,7 @@ class TransactionPage(tk.Frame):
 
         scrollbar = ttk.Scrollbar(self, orient='vertical', command=self.canv.yview)
         scrollbar.grid(row=5, column=16, sticky=tk.NS)
-        # scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.canv.configure(yscrollcommand= scrollbar.set)
-        # scrollbar.config(command=self.canv.yview)
         self.canv.bind('<Configure>', lambda e : self.canv.configure(scrollregion=self.canv.bbox("all")))
         self.frame = tk.Frame(self.canv, bg="pink")
         self.canv.create_window((0,0), window=self.frame, anchor="nw")
@@ -94,15 +86,6 @@ class TransactionPage(tk.Frame):
         lbl.grid(column=6, row=0)
 
 
-        # lbl.
-
-        # for i in range(10):
-        # if self.AccountCombo.get() in app.database.keys():
-        #     report = genAccTransReport(app.database[self.AccountCombo.get()], int(YearCombo.get()[:5]))
-        #     print(report)
-            # for i in range(len(report)):
-            #     lbl = tk.Label(self, text= report[i])
-
     def reset_scrollregion(self, event):
         self.canv.configure(scrollregion=self.canv.bbox("all"))
 
@@ -110,28 +93,14 @@ class TransactionPage(tk.Frame):
         self.canv.yview_scroll(int(-1*(event.delta/120)), "units")
 
     def genAccTransReportButton(self):
-        
-        
-
         for i in range(self.replen):
             for j in range(7):
                 self.lbl[j][i].destroy()
-                # self.lbl.grid(column=j, row=5+i)
-        # self.update()
-        # self.destroy()
-        # self.__init__(parent)
-        # print()
-        # a = DAO.getAccount(self.AccountCombo.get())
-        # print()
+
         report = genAccTransReport(DAO.getAccount(self.AccountCombo.get()), int("20"+self.YearCombo.get()[-2:]))
-        print(report)
         self.replen = len(report)
-        print(len(report))
+        
         for i in range(len(report)):
-        # if self.AccountCombo.get() in app.database.keys():
-        #     report = genAccTransReport(app.database[self.AccountCombo.get()], int(YearCombo.get()[:5]))
-        #     print(report)
-            # for i in range(len(report)):
             self.lbl[0][i] = tk.Label(self.frame, text= report[i]['Date'])
             self.lbl[0][i].grid(column=0, row=1+i)
             self.lbl[1][i] = tk.Label(self.frame, text= report[i]['ISIN Code'])
@@ -147,9 +116,6 @@ class TransactionPage(tk.Frame):
             self.lbl[6][i] = tk.Label(self.frame, text= report[i]['Total Quantity'])
             self.lbl[6][i].grid(column=6, row=1+i)
 
-
-        
-    
     def updateAcclist(self):
         acclist = DAO.getAccountList()
         self.AccountCombo['values'] = acclist
