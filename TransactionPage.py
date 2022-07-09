@@ -11,7 +11,7 @@ import app
 import DAO
 
 
-class StartPage(tk.Frame):
+class TransactionPage(tk.Frame):
 
     replen = 0
 

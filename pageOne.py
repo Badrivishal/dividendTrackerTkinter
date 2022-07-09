@@ -21,7 +21,7 @@ class PageOne(tk.Frame):
         lbl.grid(column = 0, row = 0, columnspan = 12)
         
         button = tk.Button(self, text="Transaction Mode",
-                           command=lambda: controller.show_frame("StartPage"))
+                           command=lambda: controller.show_frame("TransactionPage"))
         button.grid(column=9, row=1)
 
         button = tk.Button(self, text="Generate Report",

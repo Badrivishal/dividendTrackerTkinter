@@ -4,7 +4,7 @@ from ttkwidgets.autocomplete import AutocompleteCombobox
 from tkinter import ttk
 from application import *
 from pageOne import *
-from StartPage import *
+from TransactionPage import *
 import DAO
 import app
 
@@ -14,7 +14,7 @@ class NewAccount(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        button = tk.Button(self, text="Back",command=lambda: controller.show_frame("StartPage"))
+        button = tk.Button(self, text="Back",command=lambda: controller.show_frame("TransactionPage"))
         button.grid(column=0, row=0)
 
         lbl = tk.Label(self, text = "New Account")
