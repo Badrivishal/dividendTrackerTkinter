@@ -1,3 +1,4 @@
+from datetime import datetime
 import tkinter as tk
 from tkinter import filedialog as fd
 from tkinter import ttk
@@ -97,23 +98,23 @@ class TransactionPage(tk.Frame):
             for j in range(7):
                 self.lbl[j][i].destroy()
 
-        report = genAccTransReport(DAO.getAccount(self.AccountCombo.get()), int("20"+self.YearCombo.get()[-2:]))
-        self.replen = len(report)
+        self.report = genAccTransReport(DAO.getAccount(self.AccountCombo.get()), int("20"+self.YearCombo.get()[-2:]))
+        self.replen = len(self.report)
         
-        for i in range(len(report)):
-            self.lbl[0][i] = tk.Label(self.frame, text= report[i]['Date'])
+        for i in range(len(self.report)):
+            self.lbl[0][i] = tk.Label(self.frame, text= self.report[i]['Date'])
             self.lbl[0][i].grid(column=0, row=1+i)
-            self.lbl[1][i] = tk.Label(self.frame, text= report[i]['ISIN Code'])
+            self.lbl[1][i] = tk.Label(self.frame, text= self.report[i]['ISIN Code'])
             self.lbl[1][i].grid(column=1, row=1+i)
-            self.lbl[2][i] = tk.Label(self.frame, text= report[i]['Company Name'])
+            self.lbl[2][i] = tk.Label(self.frame, text= self.report[i]['Company Name'])
             self.lbl[2][i].grid(column=2, row=1+i)
-            self.lbl[3][i] = tk.Label(self.frame, text= report[i]['Quantity'])
+            self.lbl[3][i] = tk.Label(self.frame, text= self.report[i]['Quantity'])
             self.lbl[3][i].grid(column=3, row=1+i)
-            self.lbl[4][i] = tk.Label(self.frame, text= report[i]['Unit Price'])
+            self.lbl[4][i] = tk.Label(self.frame, text= self.report[i]['Unit Price'])
             self.lbl[4][i].grid(column=4, row=1+i)
-            self.lbl[5][i] = tk.Label(self.frame, text= report[i]['Amount'])
+            self.lbl[5][i] = tk.Label(self.frame, text= self.report[i]['Amount'])
             self.lbl[5][i].grid(column=5, row=1+i)
-            self.lbl[6][i] = tk.Label(self.frame, text= report[i]['Total Quantity'])
+            self.lbl[6][i] = tk.Label(self.frame, text= self.report[i]['Total Quantity'])
             self.lbl[6][i].grid(column=6, row=1+i)
 
     def updateAcclist(self):
@@ -126,4 +127,5 @@ class TransactionPage(tk.Frame):
         
 
     def exportReportButton(self):
-        pass
+        rep = pd.DataFrame(self.report)
+        rep.to_csv("reports\\TransactionReport"+ self.AccountCombo.get() + str(datetime.now().strftime("%Y%m%d%H%M%S")) + ".csv", sep='\t')
