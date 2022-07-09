@@ -73,6 +73,7 @@ class StartPage(tk.Frame):
         self.canv.bind('<Configure>', lambda e : self.canv.configure(scrollregion=self.canv.bbox("all")))
         self.frame = tk.Frame(self.canv, bg="pink")
         self.canv.create_window((0,0), window=self.frame, anchor="nw")
+        self.canv.bind_all("<MouseWheel>", self._on_mousewheel)
 
         self.frame.bind("<Configure>", self.reset_scrollregion)
 
@@ -104,6 +105,9 @@ class StartPage(tk.Frame):
 
     def reset_scrollregion(self, event):
         self.canv.configure(scrollregion=self.canv.bbox("all"))
+
+    def _on_mousewheel(self, event):
+        self.canv.yview_scroll(int(-1*(event.delta/120)), "units")
 
     def genAccTransReportButton(self):
         
