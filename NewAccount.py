@@ -1,12 +1,8 @@
 import tkinter as tk
-from tkinter import font as tkfont
-from ttkwidgets.autocomplete import AutocompleteCombobox
-from tkinter import ttk
 from application import *
 from pageOne import *
 from TransactionPage import *
 import DAO
-import app
 
 class NewAccount(tk.Frame):
 
@@ -14,23 +10,21 @@ class NewAccount(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        button = tk.Button(self, text="Back",command=lambda: controller.show_frame("TransactionPage"))
-        button.grid(column=0, row=0)
+        backButton = tk.Button(self, text="Back",command=lambda: controller.show_frame("TransactionPage"))
+        backButton.grid(column=0, row=0)
 
-        lbl = tk.Label(self, text = "New Account")
-        lbl.grid(column = 1, row = 0, columnspan = 12)
+        newAccountTitlelbl = tk.Label(self, text = "New Account")
+        newAccountTitlelbl.grid(column = 1, row = 0, columnspan = 12)
         
-        lbl2 = tk.Label(self, text = "Account Name")
-        lbl2.grid(column=0, row=1)
+        accNameFormlbl = tk.Label(self, text = "Account Name")
+        accNameFormlbl.grid(column=0, row=1)
         
         self.accountNameEntryBox = tk.Entry(self)
         self.accountNameEntryBox.grid(column=1, row=1)
-        
 
-
-        button = tk.Button(self, text="Submit",
+        submitButton = tk.Button(self, text="Submit",
                            command=self.createNewAccountButton)
-        button.grid(column=0, row=2)
+        submitButton.grid(column=0, row=2)
 
     def createNewAccountButton(self):
         DAO.newAccount(self.accountNameEntryBox.get())
