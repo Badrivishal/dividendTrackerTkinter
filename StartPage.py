@@ -1,0 +1,159 @@
+import tkinter as tk
+from tkinter import filedialog as fd
+from tkinter import font as tkfont
+from tkinter import ttk
+
+from click import command
+from application import *
+from pageOne import *
+import pickle
+import app
+import DAO
+
+
+class StartPage(tk.Frame):
+
+    replen = 0
+
+    lbl = [['' for i in range(100)] for i in range(7)]
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        
+
+
+        lbl = tk.Label(self, text = "Transaction Mode")
+        lbl.grid(column = 0, row = 0, columnspan = 12)
+        
+        button = tk.Button(self, text="Dividend Mode",
+                           command=lambda: controller.show_frame("PageOne"))
+        button.grid(column=9, row=1)
+
+        button = tk.Button(self, text="New Transaction",
+                           command=lambda: controller.show_frame("NewTransaction"))
+        button.grid(column=8, row=1)
+
+        button = tk.Button(self, text="New Account",
+                           command=lambda: controller.show_frame("NewAccount"))
+        button.grid(column=7, row=1)
+
+        button = tk.Button(self, text="Generate Report",
+                           command=self.genAccTransReportButton)
+        button.grid(column=6, row=1)
+
+        button = tk.Button(self, text="Import Transactions",
+                           command=self.importTransButton)
+        button.grid(column=6, row=2)
+
+        button = tk.Button(self, text="Export Report",
+                           command=self.exportReportButton)
+        button.grid(column=7, row=2)
+
+        Acclbl = tk.Label(self, text = "Accounts:")
+        Acclbl.grid(column=0, row=1)
+
+        self.AccountCombo = ttk.Combobox(self, postcommand = self.updateAcclist)
+        self.AccountCombo.grid(column=1, row=1)
+
+        Yearlbl = tk.Label(self, text = "Year:")
+        Yearlbl.grid(column=0, row=2)
+
+        self.YearCombo = ttk.Combobox(self, values = [str(i-1) + '-' + str(i)[-2:] for i in range(2022, 2010, -1)])
+        self.YearCombo.grid(column=1, row=2)
+
+        self.canv = tk.Canvas(self, width=800, height=400, bg="red")
+        self.canv.grid(column=0, row=5, columnspan=15)
+
+        scrollbar = ttk.Scrollbar(self, orient='vertical', command=self.canv.yview)
+        scrollbar.grid(row=5, column=16, sticky=tk.NS)
+        # scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.canv.configure(yscrollcommand= scrollbar.set)
+        # scrollbar.config(command=self.canv.yview)
+        self.canv.bind('<Configure>', lambda e : self.canv.configure(scrollregion=self.canv.bbox("all")))
+        self.frame = tk.Frame(self.canv, bg="pink")
+        self.canv.create_window((0,0), window=self.frame, anchor="nw")
+
+        self.frame.bind("<Configure>", self.reset_scrollregion)
+
+
+        lbl = tk.Label(self.frame, text = "Date")
+        lbl.grid(column=0, row=0)
+        lbl = tk.Label(self.frame, text = "ISIN Code")
+        lbl.grid(column=1, row=0)
+        lbl = tk.Label(self.frame, text = "Company Name")
+        lbl.grid(column=2, row=0)
+        lbl = tk.Label(self.frame, text = "Quantity")
+        lbl.grid(column=3, row=0)
+        lbl = tk.Label(self.frame, text = "Unit Price")
+        lbl.grid(column=4, row=0)
+        lbl = tk.Label(self.frame, text = "Amount")
+        lbl.grid(column=5, row=0)
+        lbl = tk.Label(self.frame, text = "Total Quantity")
+        lbl.grid(column=6, row=0)
+
+
+        # lbl.
+
+        # for i in range(10):
+        # if self.AccountCombo.get() in app.database.keys():
+        #     report = genAccTransReport(app.database[self.AccountCombo.get()], int(YearCombo.get()[:5]))
+        #     print(report)
+            # for i in range(len(report)):
+            #     lbl = tk.Label(self, text= report[i])
+
+    def reset_scrollregion(self, event):
+        self.canv.configure(scrollregion=self.canv.bbox("all"))
+
+    def genAccTransReportButton(self):
+        
+        
+
+        for i in range(self.replen):
+            for j in range(7):
+                self.lbl[j][i].destroy()
+                # self.lbl.grid(column=j, row=5+i)
+        # self.update()
+        # self.destroy()
+        # self.__init__(parent)
+        # print()
+        # a = DAO.getAccount(self.AccountCombo.get())
+        # print()
+        report = genAccTransReport(DAO.getAccount(self.AccountCombo.get()), int("20"+self.YearCombo.get()[-2:]))
+        print(report)
+        self.replen = len(report)
+        print(len(report))
+        for i in range(len(report)):
+        # if self.AccountCombo.get() in app.database.keys():
+        #     report = genAccTransReport(app.database[self.AccountCombo.get()], int(YearCombo.get()[:5]))
+        #     print(report)
+            # for i in range(len(report)):
+            self.lbl[0][i] = tk.Label(self.frame, text= report[i]['Date'])
+            self.lbl[0][i].grid(column=0, row=1+i)
+            self.lbl[1][i] = tk.Label(self.frame, text= report[i]['ISIN Code'])
+            self.lbl[1][i].grid(column=1, row=1+i)
+            self.lbl[2][i] = tk.Label(self.frame, text= report[i]['Company Name'])
+            self.lbl[2][i].grid(column=2, row=1+i)
+            self.lbl[3][i] = tk.Label(self.frame, text= report[i]['Quantity'])
+            self.lbl[3][i].grid(column=3, row=1+i)
+            self.lbl[4][i] = tk.Label(self.frame, text= report[i]['Unit Price'])
+            self.lbl[4][i].grid(column=4, row=1+i)
+            self.lbl[5][i] = tk.Label(self.frame, text= report[i]['Amount'])
+            self.lbl[5][i].grid(column=5, row=1+i)
+            self.lbl[6][i] = tk.Label(self.frame, text= report[i]['Total Quantity'])
+            self.lbl[6][i].grid(column=6, row=1+i)
+
+
+        
+    
+    def updateAcclist(self):
+        acclist = DAO.getAccountList()
+        self.AccountCombo['values'] = acclist
+
+    def importTransButton(self):
+        filename = fd.askopenfilename()
+        DAO.importTransAcc(self.AccountCombo.get(), filename)
+        
+
+    def exportReportButton(self):
+        pass
