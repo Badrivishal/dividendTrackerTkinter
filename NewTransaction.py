@@ -21,7 +21,7 @@ class NewTransaction(tk.Frame):
         button.grid(column=0, row=0)
 
         lbl = tk.Label(self, text = "New Transaction")
-        lbl.grid(column = 1, row = 0, columnspan = 12)
+        lbl.grid(column = 3, row = 0, columnspan = 12)
         
         lbl1 = tk.Label(self, text = "Date")
         lbl1.grid(column=0, row=1)
@@ -44,12 +44,12 @@ class NewTransaction(tk.Frame):
         self.accountField.grid(column=1, row=3)
         self.quantityField = tk.Entry(self)
         self.quantityField.grid(column=1, row=4)
-        self.CompanyCombo = AutocompleteCombobox(self, completevalues = DAO.getCompanyList())
+        self.CompanyCombo = AutocompleteCombobox(self, completevalues = DAO.getCompanyList(), width=50)
         self.CompanyCombo.grid(column=1, row=5)
 
         button = tk.Button(self, text="Submit",
                            command=self.createNewTransactionButton)
-        button.grid(column=0, row=6)
+        button.grid(column=1, row=6)
 
     def updateAcclist(self):
         acclist = DAO.getAccountList()
