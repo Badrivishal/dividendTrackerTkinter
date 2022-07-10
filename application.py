@@ -1,7 +1,7 @@
 import pandas as pd
 import requests
 import math
-import DAO
+import pickle
 
 mainCompanyList = []
 tax = 0.1
@@ -52,14 +52,19 @@ class Account:
         self.companiesInHolding.append(newTransaction.company)
         # self.transactions.sort()
 
+    def getCompanyisin(isin:str):
+        with open('companyData.pkl', 'rb') as f:
+            mainCompanyList = pickle.load(f)
+
+        for c in mainCompanyList:
+            if c.isinCode == isin:
+                return c
+
     def importTransactions(self, fileName:str):
         csv = pd.read_csv(fileName).to_numpy()
         for trans in csv:
-            company = DAO.getCompanyisin(trans[2])
+            company = self.getCompanyisin(trans[2])
             if(company != None):
-                # print(trans[2])
-            # for company in mainCompanyList:
-            #     if(trans[2] == company.isinCode):
                 self.addTransaction(Transaction(trans[0], trans[4], trans[3], trans[1], company))
 
 

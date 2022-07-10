@@ -1,13 +1,10 @@
 import tkinter as tk
-from tkinter import font as tkfont
 from ttkwidgets.autocomplete import AutocompleteCombobox
 from tkinter import ttk
 from application import *
 from pageOne import *
 from TransactionPage import *
-import pickle
-import app
-from tkcalendar import Calendar, DateEntry
+from tkcalendar import DateEntry
 
 
 
@@ -27,12 +24,13 @@ class NewTransaction(tk.Frame):
         lbl1.grid(column=0, row=1)
         lbl2 = tk.Label(self, text = "Account")
         lbl2.grid(column=0, row=2)
-        lbl3 = tk.Label(self, text = "Amount")
+        lbl3 = tk.Label(self, text = "Company")
         lbl3.grid(column=0, row=3)
         lbl4 = tk.Label(self, text = "Quantity")
         lbl4.grid(column=0, row=4)
-        lbl5 = tk.Label(self, text = "Company")
+        lbl5 = tk.Label(self, text = "Amount")
         lbl5.grid(column=0, row=5)
+        
 
         self.dateField=DateEntry(self,selectmode='day',date_pattern='dd-mm-yyyy')        
         self.dateField.grid(column=1, row=1)
@@ -40,12 +38,13 @@ class NewTransaction(tk.Frame):
         self.AccountCombo = ttk.Combobox(self, postcommand = self.updateAcclist)
         self.AccountCombo.grid(column=1, row=2)
         # lbl2.grid(column=1, row=2)
-        self.accountField = tk.Entry(self)
-        self.accountField.grid(column=1, row=3)
+        self.CompanyCombo = AutocompleteCombobox(self, completevalues = DAO.getCompanyList(), width=50)
+        self.CompanyCombo.grid(column=1, row=3)
         self.quantityField = tk.Entry(self)
         self.quantityField.grid(column=1, row=4)
-        self.CompanyCombo = AutocompleteCombobox(self, completevalues = DAO.getCompanyList(), width=50)
-        self.CompanyCombo.grid(column=1, row=5)
+        self.accountField = tk.Entry(self)
+        self.accountField.grid(column=1, row=5)
+        
 
         button = tk.Button(self, text="Submit",
                            command=self.createNewTransactionButton)
@@ -65,4 +64,4 @@ class NewTransaction(tk.Frame):
         # print()
         DAO.newTransaction(self.AccountCombo.get(), dt.strftime("%Y%m%d"), float(self.accountField.get()), int(self.quantityField.get()), "Purchase", self.CompanyCombo.get())
 
-        self.controller.show_frame("StartPage")
+        self.controller.show_frame("TransactionPage")

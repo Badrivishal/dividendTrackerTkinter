@@ -1,7 +1,6 @@
-from sympy import appellf1
-from application import *
 import pickle
-
+from application import *
+# from application import Account, Transaction, Company, importCompanies
 
 def newAccount(name:str):
     
@@ -48,7 +47,7 @@ def getCompanyList():
     with open('companyData.pkl', 'rb') as f:
         mainCompanyList = pickle.load(f)
 
-    companyNameList = [c.companyName for c in mainCompanyList]
+    companyNameList = [c.isinCode + " - " + c.companyName for c in mainCompanyList]
     companyNameList.sort()
 
     return companyNameList
@@ -74,8 +73,13 @@ def newTransaction(accName:str, date:str, amount:float, quantity:int, transactio
     with open('data.pkl', 'rb') as f:
         database = pickle.load(f)
     
-    company:Company = getCompany(companyName)
-    database[accName].addTransaction(Transaction(date, amount, quantity, transactionType, company))
+    
+    print(Transaction("20201012", 100.0, 10, "Purchase", Company("hello kitty", "a", "b", "c")))
+
+    company:Company = getCompanyisin(companyName[:12])
+    print(company, date, amount, quantity, transactionType)
+    transac = Transaction(date, amount, quantity, transactionType, company)
+    database[accName].addTransaction(transac)
 
     with open('data.pkl', 'wb') as f:
         pickle.dump(database, f)

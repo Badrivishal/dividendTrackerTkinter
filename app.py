@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import font as tkfont
-from tkinter import ttk
 from NewAccount import *
 from application import *
 from pageOne import *
@@ -36,7 +35,6 @@ class MyApp(tk.Tk):
             frame.grid(row=0, column=0, sticky="nsew")
 
         self.show_frame("TransactionPage")
-        # frame = self.frames["StartPage"]
         # frame.tkraise()
 
     def show_frame(self, page_name):

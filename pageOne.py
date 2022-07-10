@@ -42,7 +42,7 @@ class PageOne(tk.Frame):
         Yearlbl = tk.Label(self, text = "Year:")
         Yearlbl.grid(column=0, row=2)
 
-        self.YearCombo = ttk.Combobox(self, values = [str(i-1) + '-' + str(i)[-2:] for i in range(2022, 2010, -1)])
+        self.YearCombo = ttk.Combobox(self, values = [str(i-1) + '-' + str(i)[-2:] for i in range(datetime.now().year+1, 2010, -1)])
         self.YearCombo.grid(column=1, row=2)
 
         self.canv = tk.Canvas(self, width=1100, height=400, bg="red")

@@ -29,4 +29,4 @@ class NewAccount(tk.Frame):
     def createNewAccountButton(self):
         DAO.newAccount(self.accountNameEntryBox.get())
         self.accountNameEntryBox.delete(0, 'end')
-        self.controller.show_frame("StartPage")
+        self.controller.show_frame("TransactionPage")
