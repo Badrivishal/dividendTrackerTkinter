@@ -52,7 +52,7 @@ class Account:
         self.companiesInHolding.append(newTransaction.company)
         # self.transactions.sort()
 
-    def getCompanyisin(isin:str):
+    def getCompanyisin(self, isin:str):
         with open('companyData.pkl', 'rb') as f:
             mainCompanyList = pickle.load(f)
 
@@ -60,7 +60,12 @@ class Account:
             if c.isinCode == isin:
                 return c
 
+    def clearTransactions(self):
+        self.transactions.clear()
+        self.companiesInHolding.clear()
+
     def importTransactions(self, fileName:str):
+        self.clearTransactions()
         csv = pd.read_csv(fileName).to_numpy()
         for trans in csv:
             company = self.getCompanyisin(trans[2])
