@@ -107,7 +107,7 @@ class PageOne(tk.Frame):
             self.lbl[3][i].grid(column=3, row=5+i)
             self.lbl[4][i] = tk.Label(self.frame, text= self.report[i]['Quantity'])
             self.lbl[4][i].grid(column=4, row=5+i)
-            self.lbl[5][i] = tk.Label(self.frame, text= self.report[i]['Dividend Amount'])
+            self.lbl[5][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Dividend Amount']))
             self.lbl[5][i].grid(column=5, row=5+i)
             self.lbl[6][i] = tk.Label(self.frame, text= self.report[i]['Recieved Date'])
             self.lbl[6][i].grid(column=6, row=5+i)
@@ -115,7 +115,7 @@ class PageOne(tk.Frame):
             self.lbl[7][i].grid(column=7, row=5+i)
             self.lbl[8][i] = tk.Label(self.frame, text= self.report[i]['Tax Amount'])
             self.lbl[8][i].grid(column=8, row=5+i)
-            self.lbl[9][i] = tk.Label(self.frame, text= self.report[i]['Final Amount'])
+            self.lbl[9][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Final Amount']))
             self.lbl[9][i].grid(column=9, row=5+i)        
     
     def updateAcclist(self):

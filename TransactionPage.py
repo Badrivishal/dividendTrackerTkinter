@@ -110,7 +110,7 @@ class TransactionPage(tk.Frame):
             self.lbl[2][i].grid(column=2, row=1+i)
             self.lbl[3][i] = tk.Label(self.frame, text= self.report[i]['Quantity'])
             self.lbl[3][i].grid(column=3, row=1+i)
-            self.lbl[4][i] = tk.Label(self.frame, text= self.report[i]['Unit Price'])
+            self.lbl[4][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Unit Price']))
             self.lbl[4][i].grid(column=4, row=1+i)
             self.lbl[5][i] = tk.Label(self.frame, text= self.report[i]['Amount'])
             self.lbl[5][i].grid(column=5, row=1+i)

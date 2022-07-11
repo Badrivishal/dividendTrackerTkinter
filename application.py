@@ -194,7 +194,13 @@ def genAccTransReport(account:Account, finYear:int):
             
             report.append({'Date': trans.date, 'ISIN Code': trans.company.isinCode, 'BSE Code': trans.company.bseCode, 'NSE Code': trans.company.nseCode, 'Company Name': trans.company.companyName, 'Quantity': trans.quantity, 'Unit Price': trans.amount/trans.quantity, 'Amount':trans.amount, 'Total Quantity':totalQuantityPerCompanyDict[trans.company]})
     # print(report)
+    if(len(report) == 0):
+                totalQuantityPerCompanyDict = totalPrevQuantityPerCompanyDict.copy()
+                for company in list(totalPrevQuantityPerCompanyDict.keys()):
+                    report.append({'Date': '00000000', 'ISIN Code': company.isinCode, 'BSE Code':company.bseCode, 'NSE Code':company.nseCode, 'Company Name':company.companyName, 'Quantity':totalPrevQuantityPerCompanyDict[company], 'Unit Price': totalPrevAmountPerCompanyDict[company]/totalPrevQuantityPerCompanyDict[company], 'Amount':totalPrevAmountPerCompanyDict[company], 'Total Quantity':totalPrevQuantityPerCompanyDict[company]})
     report.sort(key=lambda x: int(x['Date']))
+    for i in report:
+        print(i)
     return report
 
 
