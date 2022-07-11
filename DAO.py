@@ -84,4 +84,11 @@ def newTransaction(accName:str, date:str, amount:float, quantity:int, transactio
     with open('data.pkl', 'wb') as f:
         pickle.dump(database, f)
 
+def reset():
+    with open('data.pkl', 'rb') as f:
+        database = pickle.load(f)
 
+    database = {}
+
+    with open('data.pkl', 'wb') as f:
+        pickle.dump(database, f)
