@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox as tkMessageBox
 from application import *
 from pageOne import *
 from TransactionPage import *
@@ -29,4 +30,6 @@ class NewAccount(tk.Frame):
     def createNewAccountButton(self):
         DAO.newAccount(self.accountNameEntryBox.get())
         self.accountNameEntryBox.delete(0, 'end')
+        tkMessageBox.showinfo("Information","New Transaction was Added")
+
         self.controller.show_frame("TransactionPage")

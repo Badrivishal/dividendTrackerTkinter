@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox as tkMessageBox
 from ttkwidgets.autocomplete import AutocompleteCombobox
 from tkinter import ttk
 from application import *
@@ -63,5 +64,5 @@ class NewTransaction(tk.Frame):
         dt = self.dateField.get_date()
         # print()
         DAO.newTransaction(self.AccountCombo.get(), dt.strftime("%Y%m%d"), float(self.accountField.get()), int(self.quantityField.get()), "Purchase", self.CompanyCombo.get())
-
+        tkMessageBox.showinfo("Information","New Transaction was Added")
         self.controller.show_frame("TransactionPage")

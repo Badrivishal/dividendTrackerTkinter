@@ -45,6 +45,10 @@ class TransactionPage(tk.Frame):
                            command=self.exportReportButton)
         button.grid(column=7, row=2)
 
+        button = tk.Button(self, text="Reset",
+                           command=DAO.reset)
+        button.grid(column=8, row=2)
+
         Acclbl = tk.Label(self, text = "Accounts:")
         Acclbl.grid(column=0, row=1)
 
