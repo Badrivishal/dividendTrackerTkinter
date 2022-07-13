@@ -47,7 +47,7 @@ class TransactionPage(tk.Frame):
         button.grid(column=7, row=2)
 
         button = tk.Button(self, text="Reset",
-                           command=DAO.reset)
+                           command=self.reset)
         button.grid(column=8, row=2)
 
         Acclbl = tk.Label(self, text = "Accounts:")
@@ -134,7 +134,9 @@ class TransactionPage(tk.Frame):
         else:
             tkMessageBox.showinfo("Information","Please check the isin Numbers: " + ", ".join(failed))
 
-
+    def reset(self):
+        if(tkMessageBox.askquestion("askquestion", "Are you sure?") == "yes"):
+            DAO.reset()
         
 
     def exportReportButton(self):

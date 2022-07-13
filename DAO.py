@@ -73,12 +73,10 @@ def newTransaction(accName:str, date:str, amount:float, quantity:int, transactio
     
     with open('data.pkl', 'rb') as f:
         database = pickle.load(f)
-    
-    
-    print(Transaction("20201012", 100.0, 10, "Purchase", Company("hello kitty", "a", "b", "c")))
+    # print(Transaction("20201012", 100.0, 10, "Purchase", Company("hello kitty", "a", "b", "c")))
 
     company:Company = getCompanyisin(companyName[:12])
-    print(company, date, amount, quantity, transactionType)
+    # print(company, date, amount, quantity, transactionType)
     transac = Transaction(date, amount, quantity, transactionType, company)
     database[accName].addTransaction(transac)
 

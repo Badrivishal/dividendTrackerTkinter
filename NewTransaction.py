@@ -27,10 +27,12 @@ class NewTransaction(tk.Frame):
         lbl2.grid(column=0, row=2)
         lbl3 = tk.Label(self, text = "Company")
         lbl3.grid(column=0, row=3)
-        lbl4 = tk.Label(self, text = "Quantity")
+        lbl4 = tk.Label(self, text = "Transaction Type")
         lbl4.grid(column=0, row=4)
-        lbl5 = tk.Label(self, text = "Amount")
+        lbl5 = tk.Label(self, text = "Quantity")
         lbl5.grid(column=0, row=5)
+        lbl6 = tk.Label(self, text = "Amount")
+        lbl6.grid(column=0, row=6)
         
 
         self.dateField=DateEntry(self,selectmode='day',date_pattern='dd-mm-yyyy')        
@@ -41,15 +43,17 @@ class NewTransaction(tk.Frame):
         # lbl2.grid(column=1, row=2)
         self.CompanyCombo = AutocompleteCombobox(self, completevalues = DAO.getCompanyList(), width=50)
         self.CompanyCombo.grid(column=1, row=3)
+        self.TransTypeCombo = ttk.Combobox(self, values=["Opening Balance", "Purchase", "Sale"])
+        self.TransTypeCombo.grid(column=1, row=4)
         self.quantityField = tk.Entry(self)
-        self.quantityField.grid(column=1, row=4)
+        self.quantityField.grid(column=1, row=5)
         self.accountField = tk.Entry(self)
-        self.accountField.grid(column=1, row=5)
+        self.accountField.grid(column=1, row=6)
         
 
         button = tk.Button(self, text="Submit",
                            command=self.createNewTransactionButton)
-        button.grid(column=1, row=6)
+        button.grid(column=1, row=7)
 
     def updateAcclist(self):
         acclist = DAO.getAccountList()
@@ -63,6 +67,6 @@ class NewTransaction(tk.Frame):
     def createNewTransactionButton(self):
         dt = self.dateField.get_date()
         # print()
-        DAO.newTransaction(self.AccountCombo.get(), dt.strftime("%Y%m%d"), float(self.accountField.get()), int(self.quantityField.get()), "Purchase", self.CompanyCombo.get())
+        DAO.newTransaction(self.AccountCombo.get(), dt.strftime("%Y%m%d"), float(self.accountField.get()), int(self.quantityField.get()), self.TransTypeCombo.get(), self.CompanyCombo.get())
         tkMessageBox.showinfo("Information","New Transaction was Added")
         self.controller.show_frame("TransactionPage")
