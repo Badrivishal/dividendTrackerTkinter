@@ -3,6 +3,8 @@ import requests
 import math
 import pickle
 
+from sympy import re
+
 mainCompanyList = []
 tax = 0.1
 class Dividend:
@@ -67,10 +69,14 @@ class Account:
     def importTransactions(self, fileName:str):
         self.clearTransactions()
         csv = pd.read_csv(fileName).to_numpy()
+        failed = []
         for trans in csv:
             company = self.getCompanyisin(trans[2])
             if(company != None):
                 self.addTransaction(Transaction(trans[0], trans[4], trans[3], trans[1], company))
+            else:
+                failed.append(trans[2])
+        return failed
 
 
 def importCompanies():

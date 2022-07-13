@@ -31,10 +31,11 @@ def importTransAcc(accountName:str, filename:str):
     with open('data.pkl', 'rb') as f:
         database = pickle.load(f)
     
-    database[accountName].importTransactions(filename)
+    failed = database[accountName].importTransactions(filename)
 
     with open('data.pkl', 'wb') as f:
         pickle.dump(database, f)
+    return failed
 
 
 def updateCompanyList():

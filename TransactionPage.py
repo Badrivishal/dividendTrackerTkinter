@@ -1,5 +1,6 @@
 from datetime import datetime
 import tkinter as tk
+from tkinter import messagebox as tkMessageBox
 from tkinter import filedialog as fd
 from tkinter import ttk
 from click import command
@@ -127,7 +128,13 @@ class TransactionPage(tk.Frame):
 
     def importTransButton(self):
         filename = fd.askopenfilename()
-        DAO.importTransAcc(self.AccountCombo.get(), filename)
+        failed = DAO.importTransAcc(self.AccountCombo.get(), filename)
+        if len(failed) == 0:
+            tkMessageBox.showinfo("Information","All the transactions were imported to the account ", self.AccountCombo.get())
+        else:
+            tkMessageBox.showinfo("Information","Please check the isin Numbers: " + ", ".join(failed))
+
+
         
 
     def exportReportButton(self):
