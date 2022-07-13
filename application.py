@@ -241,7 +241,7 @@ def genAccDividendReport(account:Account, finYear:int):
                 # print(len(accTransReport))
                 for trans in accTransReport:
                     # print(trans['date'], dividend.declaredDate)
-                    if(int(trans['Date']) < int(dividend.declaredDate)):
+                    if(int(trans['Date']) < int(dividend.declaredDate) and trans['ISIN Code'] == company.isinCode):
                         # print(trans['date'])
                         totalQuantity = trans['Total Quantity']
                 row = {'Date': dividend.declaredDate, 'ISIN Code': company.isinCode, 'BSE Code': company.bseCode, 'NSE Code': company.nseCode, 'Company Name': company.companyName, 'Dividend Declared': dividend.dividend, 'Quantity': totalQuantity, 'Dividend Amount': dividend.dividend*totalQuantity, 'Recieved Date':dividend.recievedDate, 'Recieved Amount': dividend.recievedAmount}

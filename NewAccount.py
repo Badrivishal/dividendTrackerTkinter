@@ -30,6 +30,6 @@ class NewAccount(tk.Frame):
     def createNewAccountButton(self):
         DAO.newAccount(self.accountNameEntryBox.get())
         self.accountNameEntryBox.delete(0, 'end')
-        tkMessageBox.showinfo("Information","New Transaction was Added")
+        tkMessageBox.showinfo("Information","New Account was Added")
 
         self.controller.show_frame("TransactionPage")
