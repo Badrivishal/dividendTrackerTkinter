@@ -125,4 +125,4 @@ class PageOne(tk.Frame):
 
     def exportReportButton(self):
         rep = pd.DataFrame(self.report)
-        rep.to_csv("reports\\DividendReport" + self.AccountCombo.get() + str(datetime.now().strftime("%Y%m%d%H%M%S")) + ".csv", sep='\t')
+        rep.to_csv("reports\\DividendReport" + self.AccountCombo.get() + str(datetime.now().strftime("%Y%m%d%H%M%S")) + ".csv")

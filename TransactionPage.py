@@ -50,6 +50,10 @@ class TransactionPage(tk.Frame):
                            command=self.reset)
         button.grid(column=8, row=2)
 
+        button = tk.Button(self, text="Account Transactions Export",
+                           command=self.accTransExp)
+        button.grid(column=9, row=2)
+
         Acclbl = tk.Label(self, text = "Accounts:")
         Acclbl.grid(column=0, row=1)
 
@@ -141,4 +145,10 @@ class TransactionPage(tk.Frame):
 
     def exportReportButton(self):
         rep = pd.DataFrame(self.report)
-        rep.to_csv("reports\\TransactionReport"+ self.AccountCombo.get() + str(datetime.now().strftime("%Y%m%d%H%M%S")) + ".csv", sep='\t')
+        rep.to_csv("reports\\TransactionReport"+ self.AccountCombo.get() + str(datetime.now().strftime("%Y%m%d%H%M%S")) + ".csv")
+
+    def accTransExp(self):
+        data = DAO.accountTransactions(self.AccountCombo.get())
+        data = [["Date", "Type",	"ISIN",	"Total (qty)",	"Total Amount"]] + [[d.date, d.transType, d.company.isinCode, d.quantity, d.amount] for d in data]
+        rep = pd.DataFrame(data)
+        rep.to_csv("reports\\"+ self.AccountCombo.get() + "AccountTransactions" + str(datetime.now().strftime("%Y%m%d%H%M%S")) + ".csv", header=False, index=False)
