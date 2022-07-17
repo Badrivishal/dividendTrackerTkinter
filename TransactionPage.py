@@ -13,7 +13,7 @@ class TransactionPage(tk.Frame):
 
     replen = 0
 
-    lbl = [['' for _ in range(100)] for _ in range(7)]
+    lbl = [['' for _ in range(1000)] for _ in range(7)]
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -103,6 +103,8 @@ class TransactionPage(tk.Frame):
         self.canv.yview_scroll(int(-1*(event.delta/120)), "units")
 
     def genAccTransReportButton(self):
+        print(self.replen)
+        print(len(self.lbl[0]))
         for i in range(self.replen):
             for j in range(7):
                 self.lbl[j][i].destroy()
