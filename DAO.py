@@ -17,8 +17,8 @@ def updateAccountDiv(name:str, acc):
         database = pickle.load(f)
     database[name] = acc
 
-    for i in range(len(database[name].companiesInHolding)):
-        print(database[name].companiesInHolding[i].dividendsDeclared)
+    # for i in range(len(database[name].companiesInHolding)):
+    #     print(database[name].companiesInHolding[i].dividendsDeclared)
 
     with open('data.pkl', 'wb') as f:
         pickle.dump(database, f)

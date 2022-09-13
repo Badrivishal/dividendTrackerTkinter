@@ -99,10 +99,10 @@ class PageOne(tk.Frame):
         account = DAO.getAccount(self.AccountCombo.get())
         finYear = int("20"+self.YearCombo.get()[-2:])
         account = importDividends(account, finYear)
-        print("Updating------------------")
+        # print("Updating------------------")
         
         DAO.updateAccountDiv(self.AccountCombo.get(),  account)
-        print("Updatedddddddd===============================")
+        # print("Updatedddddddd===============================")
         self.report = genAccDividendReport(account, finYear)
         self.replen = len(self.report)
         
