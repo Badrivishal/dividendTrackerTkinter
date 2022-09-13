@@ -148,6 +148,7 @@ class PageOne(tk.Frame):
         dateField=DateEntry(pop,selectmode='day',date_pattern='dd-mm-yyyy')        
         dateField.grid(column=1, row=1)
         accountField = tk.Entry(pop)
+        accountField.insert(0, "{:.2f}".format(self.report[val]['Final Amount']))
         accountField.grid(column=1, row=2)
         button = tk.Button(pop, text="Submit",
                            command=lambda: self.updateRecieved(self.report[val]['Id'], dateField.get_date().strftime("%Y%m%d"), accountField.get(), val))
