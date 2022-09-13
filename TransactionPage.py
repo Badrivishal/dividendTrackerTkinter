@@ -8,6 +8,7 @@ from application import *
 from pageOne import *
 import DAO
 
+#TODO https://stackoverflow.com/questions/50422735/tkinter-resize-frame-and-contents-with-main-window
 
 class TransactionPage(tk.Frame):
 
@@ -66,7 +67,7 @@ class TransactionPage(tk.Frame):
         self.YearCombo = ttk.Combobox(self, values = [str(i-1) + '-' + str(i)[-2:] for i in range(datetime.now().year+1, 2010, -1)])
         self.YearCombo.grid(column=1, row=2)
 
-        self.canv = tk.Canvas(self, width=800, height=400, bg="red")
+        self.canv = tk.Canvas(self, width=1200, height=400, bg="red")
         self.canv.grid(column=0, row=5, columnspan=15)
 
         scrollbar = ttk.Scrollbar(self, orient='vertical', command=self.canv.yview)

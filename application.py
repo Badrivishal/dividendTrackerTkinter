@@ -9,14 +9,16 @@ mainCompanyList = []
 tax = 0.1
 class Dividend:
 
-    def __init__(self, declaredDate:str = '00000000', dividend:float = 0):
+    def __init__(self, uid, declaredDate:str = '00000000', dividend:float = 0):
+        self.uid = uid
         self.declaredDate = declaredDate
         self.recievedDate:str = ''
         self.dividend = dividend
         self.recievedAmount = 0
     
-    def setRecievedDate(self, date:str):
+    def update(self, date:str, amount:float):
         self.recievedDate = date
+        self.recievedAmount = amount
 
 class Company:
 
@@ -29,7 +31,12 @@ class Company:
         self.dividendsDeclared:list = []
     
     def addDividend(self, newDividend:Dividend):
-        if newDividend not in self.dividendsDeclared:
+        flag = 0
+        for div in self.dividendsDeclared:
+            if(div.uid == newDividend.uid):
+                flag = 1
+                break
+        if flag == 0:
             self.dividendsDeclared.append(newDividend)
 
 class Transaction:
@@ -156,12 +163,12 @@ def importDividends(acc:Account, year):
     
     df.drop(['short_name', 'Ex_date', 'long_name', 'RD_Date', 'BCRD_FROM', 'BCRD_TO', 'ND_START_DATE', 'ND_END_DATE', 'payment_date'], axis=1, inplace=True)
     
-    for dividend in df.to_numpy():
+    for indx, dividend in enumerate(df.to_numpy()):
         for company in acc.companiesInHolding:
             if(company.bseCode == dividend[0]):
                 if(dividend[1].find('Rs. - ')!=-1):
                     div = float(dividend[1].split('Rs. - ')[1])
-                    company.addDividend(Dividend(dividend[2], div))
+                    company.addDividend(Dividend(str(year) + str(indx), dividend[2], div))
                     break
 
     return acc
@@ -219,7 +226,7 @@ def genAccDividendReport(account:Account, finYear:int):
     report = []
     accTransReport = genAccTransReport(account, finYear)
     # print(accTransReport)
-    account = importDividends(account, finYear)
+    # account = importDividends(account, finYear)
     taxedYet = {}
     totalQuantity = 0
     row = {}
@@ -261,6 +268,7 @@ def genAccDividendReport(account:Account, finYear:int):
                 else:
                     row['Tax Amount'] = 0
                     row['Final Amount'] = row['Dividend Amount'] - row['Tax Amount']
+                row['Id'] = dividend.uid
                 report.append(row)
     # print(len(report))
     report.sort(key=lambda x: int(x['Date']))

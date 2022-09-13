@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import font as tkfont
+from tkinter import Toplevel, font as tkfont
 from tkinter import ttk
 from application import *
 from pageOne import *
@@ -7,13 +7,14 @@ import pickle
 import app
 from datetime import datetime
 import DAO
+from tkcalendar import DateEntry
 
 
 class PageOne(tk.Frame):
 
     replen = 0
 
-    lbl = [['' for i in range(100)] for i in range(10)]
+    lbl = [['' for i in range(1000)] for i in range(11)]
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -80,6 +81,8 @@ class PageOne(tk.Frame):
         lbl.grid(column=8, row=4)
         lbl = tk.Label(self.frame, text = "Final Amount")
         lbl.grid(column=9, row=4)
+        lbl = tk.Label(self.frame, text = "Recv Button")
+        lbl.grid(column=10, row=4)
 
     def reset_scrollregion(self, event):
         self.canv.configure(scrollregion=self.canv.bbox("all"))
@@ -90,10 +93,17 @@ class PageOne(tk.Frame):
 
     def genAccDivReportButton(self):
         for i in range(self.replen):
-            for j in range(10):
+            for j in range(11):
                 self.lbl[j][i].destroy()
-
-        self.report = genAccDividendReport(DAO.getAccount(self.AccountCombo.get()), int("20"+self.YearCombo.get()[-2:]))
+        
+        account = DAO.getAccount(self.AccountCombo.get())
+        finYear = int("20"+self.YearCombo.get()[-2:])
+        account = importDividends(account, finYear)
+        print("Updating------------------")
+        
+        DAO.updateAccountDiv(self.AccountCombo.get(),  account)
+        print("Updatedddddddd===============================")
+        self.report = genAccDividendReport(account, finYear)
         self.replen = len(self.report)
         
         for i in range(len(self.report)):
@@ -117,10 +127,49 @@ class PageOne(tk.Frame):
             self.lbl[8][i].grid(column=8, row=5+i)
             self.lbl[9][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Final Amount']))
             self.lbl[9][i].grid(column=9, row=5+i)        
+            self.lbl[10][i] = tk.Button(self.frame, text="Add Recieved Note",
+                           command=lambda val=i: self.AddRecievedNote(val))
+            self.lbl[10][i].grid(column=10, row=5+i)
     
     def updateAcclist(self):
         acclist = DAO.getAccountList()
         self.AccountCombo['values'] = acclist
+
+    def AddRecievedNote(self, val):
+        global pop
+        pop = Toplevel(self)
+        pop.title("Update Recieved")
+        lab = tk.Label(pop, text= self.report[val]['Company Name'])
+        lab.grid(row=0, column=0)
+        lab = tk.Label(pop, text= "Recieved Date")
+        lab.grid(row=1, column=0)
+        lab = tk.Label(pop, text= "Recieved Amount")
+        lab.grid(row=2, column=0)
+        dateField=DateEntry(pop,selectmode='day',date_pattern='dd-mm-yyyy')        
+        dateField.grid(column=1, row=1)
+        accountField = tk.Entry(pop)
+        accountField.grid(column=1, row=2)
+        button = tk.Button(pop, text="Submit",
+                           command=lambda: self.updateRecieved(self.report[val]['Id'], dateField.get_date().strftime("%Y%m%d"), accountField.get(), val))
+        button.grid(column=1, row=3)
+        
+    
+    def updateRecieved(self, uid, date, amount, row):
+        # print(uid, date, amount)
+
+        account = DAO.getAccount(self.AccountCombo.get())
+        for company in account.companiesInHolding:
+            for div in company.dividendsDeclared:
+                if div.uid == uid:
+                    div.update(date, amount)
+        DAO.updateAccountDiv(account.accountHoldersName, account)
+        self.lbl[6][row].destroy()
+        self.lbl[7][row].destroy()
+        self.lbl[6][row] = tk.Label(self.frame, text= str(date))
+        self.lbl[6][row].grid(column=6, row=5+row)
+        self.lbl[7][row] = tk.Label(self.frame, text= str(amount))
+        self.lbl[7][row].grid(column=7, row=5+row)
+        pop.destroy()
 
 
     def exportReportButton(self):

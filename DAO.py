@@ -12,7 +12,16 @@ def newAccount(name:str):
     with open('data.pkl', 'wb') as f:
         pickle.dump(database, f)
 
+def updateAccountDiv(name:str, acc):
+    with open('data.pkl', 'rb') as f:
+        database = pickle.load(f)
+    database[name] = acc
 
+    for i in range(len(database[name].companiesInHolding)):
+        print(database[name].companiesInHolding[i].dividendsDeclared)
+
+    with open('data.pkl', 'wb') as f:
+        pickle.dump(database, f)
 
 def getAccountList():
     with open('data.pkl', 'rb') as f:

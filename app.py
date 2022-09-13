@@ -12,8 +12,9 @@ class MyApp(tk.Tk):
 
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
+        self.attributes('-fullscreen',True)
 
-        self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
+        self.title_font = tkfont.Font(family='Helvetica', size=25, weight="bold", slant="italic")
 
         # the container is where we'll stack a bunch of frames
         # on top of each other, then the one we want visible
@@ -45,5 +46,6 @@ class MyApp(tk.Tk):
 
 
 if __name__ == "__main__":
+    DAO.updateCompanyList()
     app = MyApp()
     app.mainloop()
