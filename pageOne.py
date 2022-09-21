@@ -46,7 +46,7 @@ class PageOne(tk.Frame):
         self.YearCombo = ttk.Combobox(self, values = [str(i-1) + '-' + str(i)[-2:] for i in range(datetime.now().year+1, 2010, -1)])
         self.YearCombo.grid(column=1, row=2)
 
-        self.canv = tk.Canvas(self, width=1100, height=400, bg="red")
+        self.canv = tk.Canvas(self, width=1500, height=700,  bg="red")
         self.canv.grid(column=0, row=5, columnspan=16)
 
         scrollbar = ttk.Scrollbar(self, orient='vertical', command=self.canv.yview)
@@ -58,6 +58,11 @@ class PageOne(tk.Frame):
         self.canv.bind_all("<MouseWheel>", self._on_mousewheel)
 
         self.frame.bind("<Configure>", self.reset_scrollregion)
+
+        self.canv.bind("<Left>",  lambda event: self.canv.xview_scroll(-1, "units"))
+        self.canv.bind("<Right>", lambda event: self.canv.xview_scroll( 1, "units"))
+        self.canv.bind("<Up>",    lambda event: self.canv.yview_scroll(-1, "units"))
+        self.canv.bind("<Down>",  lambda event: self.canv.yview_scroll( 1, "units"))
 
 
 
@@ -107,7 +112,7 @@ class PageOne(tk.Frame):
         self.replen = len(self.report)
         
         for i in range(len(self.report)):
-            self.lbl[0][i] = tk.Label(self.frame, text= self.report[i]['Date'])
+            self.lbl[0][i] = tk.Label(self.frame, text= datetime.strptime(str(self.report[i]['Date']), '%Y%m%d').strftime("%d/%m/%y"))
             self.lbl[0][i].grid(column=0, row=5+i)
             self.lbl[1][i] = tk.Label(self.frame, text= self.report[i]['ISIN Code'])
             self.lbl[1][i].grid(column=1, row=5+i)
@@ -119,7 +124,7 @@ class PageOne(tk.Frame):
             self.lbl[4][i].grid(column=4, row=5+i)
             self.lbl[5][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Dividend Amount']))
             self.lbl[5][i].grid(column=5, row=5+i)
-            self.lbl[6][i] = tk.Label(self.frame, text= self.report[i]['Recieved Date'])
+            self.lbl[6][i] = tk.Label(self.frame, text= datetime.strptime(str(self.report[i]['Recieved Date']), '%Y%m%d').strftime("%d/%m/%y") if len(str(self.report[i]['Recieved Date'])) > 1 else "")
             self.lbl[6][i].grid(column=6, row=5+i)
             self.lbl[7][i] = tk.Label(self.frame, text= self.report[i]['Recieved Amount'])
             self.lbl[7][i].grid(column=7, row=5+i)
@@ -130,6 +135,7 @@ class PageOne(tk.Frame):
             self.lbl[10][i] = tk.Button(self.frame, text="Add Recieved Note",
                            command=lambda val=i: self.AddRecievedNote(val))
             self.lbl[10][i].grid(column=10, row=5+i)
+        self.canv.focus_set()
     
     def updateAcclist(self):
         acclist = DAO.getAccountList()
@@ -166,7 +172,7 @@ class PageOne(tk.Frame):
         DAO.updateAccountDiv(account.accountHoldersName, account)
         self.lbl[6][row].destroy()
         self.lbl[7][row].destroy()
-        self.lbl[6][row] = tk.Label(self.frame, text= str(date))
+        self.lbl[6][row] = tk.Label(self.frame, text= datetime.strptime(str(date), '%Y%m%d').strftime("%d/%m/%y"))
         self.lbl[6][row].grid(column=6, row=5+row)
         self.lbl[7][row] = tk.Label(self.frame, text= str(amount))
         self.lbl[7][row].grid(column=7, row=5+row)
@@ -175,4 +181,4 @@ class PageOne(tk.Frame):
 
     def exportReportButton(self):
         rep = pd.DataFrame(self.report)
-        rep.to_csv("reports\\DividendReport" + self.AccountCombo.get() + str(datetime.now().strftime("%Y%m%d%H%M%S")) + ".csv")
+        rep.to_csv("..\\reports\\DividendReport" + self.AccountCombo.get() + str(datetime.now().strftime("%Y%m%d%H%M%S")) + ".csv")

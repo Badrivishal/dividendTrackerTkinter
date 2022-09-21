@@ -59,7 +59,7 @@ class Account:
     def addTransaction(self, newTransaction:Transaction):
         self.transactions.append(newTransaction)
         self.companiesInHolding.append(newTransaction.company)
-        # self.transactions.sort()
+        self.transactions.sort(key=lambda x:int(x.date))
 
     def getCompanyisin(self, isin:str):
         with open('companyData.pkl', 'rb') as f:
@@ -181,36 +181,45 @@ def genAccTransReport(account:Account, finYear:int):
     totalQuantityPerCompanyDict = {}
 
     for trans in account.transactions:
+        print(trans.company.companyName, trans.company, trans.transType, trans.date)
         if(int(trans.date) < int(str(finYear-1) + '0401')):
             try:
                 if(trans.transType == 'Opening Balance'):
-                    totalPrevQuantityPerCompanyDict[trans.company] = trans.quantity
-                    totalPrevAmountPerCompanyDict[trans.company] = trans.amount
+                    totalPrevQuantityPerCompanyDict[trans.company.isinCode] = trans.quantity
+                    totalPrevAmountPerCompanyDict[trans.company.isinCode] = trans.amount
                 elif(trans.transType == 'Purchase'):
-                    totalPrevQuantityPerCompanyDict[trans.company] += trans.quantity
-                    totalPrevAmountPerCompanyDict[trans.company] += trans.amount
+                    totalPrevQuantityPerCompanyDict[trans.company.isinCode] += trans.quantity
+                    totalPrevAmountPerCompanyDict[trans.company.isinCode] += trans.amount
                 elif(trans.transType == 'Sale'):
-                    totalPrevQuantityPerCompanyDict[trans.company] -= trans.quantity
-                    totalPrevAmountPerCompanyDict[trans.company] -= trans.amount
+                    print("hi, I want to sell")
+                    totalPrevQuantityPerCompanyDict[trans.company.isinCode] -= trans.quantity
+                    totalPrevAmountPerCompanyDict[trans.company.isinCode] -= trans.amount
             except:
-                totalPrevQuantityPerCompanyDict[trans.company] = trans.quantity
-                totalPrevAmountPerCompanyDict[trans.company] = trans.amount
+                totalPrevQuantityPerCompanyDict[trans.company.isinCode] = trans.quantity
+                totalPrevAmountPerCompanyDict[trans.company.isinCode] = trans.amount
         elif(int(str(finYear-1) + '0401') <= int(trans.date) <=  int(str(finYear) + '0331')):
             if(len(report) == 0):
                 totalQuantityPerCompanyDict = totalPrevQuantityPerCompanyDict.copy()
                 for company in list(totalPrevQuantityPerCompanyDict.keys()):
-                    report.append({'Date': '00000000', 'ISIN Code': company.isinCode, 'BSE Code':company.bseCode, 'NSE Code':company.nseCode, 'Company Name':company.companyName, 'Quantity':totalPrevQuantityPerCompanyDict[company], 'Unit Price': totalPrevAmountPerCompanyDict[company]/totalPrevQuantityPerCompanyDict[company], 'Amount':totalPrevAmountPerCompanyDict[company], 'Total Quantity':totalPrevQuantityPerCompanyDict[company]})
+                    for c in account.companiesInHolding:
+                        if c.isinCode == company:
+                            company = c
+                    # company = account.getCompanyisin(company)
+                    if(totalPrevQuantityPerCompanyDict[company.isinCode]!=0):
+                        report.append({'Date': '00000000', 'ISIN Code': company.isinCode, 'BSE Code':company.bseCode, 'NSE Code':company.nseCode, 'Company Name':company.companyName, 'Quantity':totalPrevQuantityPerCompanyDict[company.isinCode], 'Unit Price': totalPrevAmountPerCompanyDict[company.isinCode]/totalPrevQuantityPerCompanyDict[company.isinCode], 'Amount':totalPrevAmountPerCompanyDict[company.isinCode], 'Total Quantity':totalPrevQuantityPerCompanyDict[company.isinCode]})
             try:
                 if(trans.transType == 'Opening Balance'):
-                    totalQuantityPerCompanyDict[trans.company] = trans.quantity
+                    totalQuantityPerCompanyDict[trans.company.isinCode] = trans.quantity
                 elif(trans.transType == 'Purchase'):
-                    totalQuantityPerCompanyDict[trans.company] += trans.quantity
+                    totalQuantityPerCompanyDict[trans.company.isinCode] += trans.quantity
                 elif(trans.transType == 'Sale'):
-                    totalQuantityPerCompanyDict[trans.company] -= trans.quantity
+                    print("hi Im selling here though", totalQuantityPerCompanyDict)
+                    totalQuantityPerCompanyDict[trans.company.isinCode] -= trans.quantity
             except:
-                totalQuantityPerCompanyDict[trans.company] = trans.quantity
+                print("hi, im stupid if I ended up here", totalQuantityPerCompanyDict)
+                totalQuantityPerCompanyDict[trans.company.isinCode] = trans.quantity
             
-            report.append({'Date': trans.date, 'ISIN Code': trans.company.isinCode, 'BSE Code': trans.company.bseCode, 'NSE Code': trans.company.nseCode, 'Company Name': trans.company.companyName, 'Quantity': trans.quantity, 'Unit Price': trans.amount/trans.quantity, 'Amount':trans.amount, 'Total Quantity':totalQuantityPerCompanyDict[trans.company]})
+            report.append({'Date': trans.date, 'ISIN Code': trans.company.isinCode, 'BSE Code': trans.company.bseCode, 'NSE Code': trans.company.nseCode, 'Company Name': trans.company.companyName, 'Quantity': trans.quantity, 'Unit Price': trans.amount/trans.quantity, 'Amount':trans.amount, 'Total Quantity':totalQuantityPerCompanyDict[trans.company.isinCode]})
     # print(report)
     if(len(report) == 0):
                 totalQuantityPerCompanyDict = totalPrevQuantityPerCompanyDict.copy()
