@@ -67,7 +67,7 @@ class TransactionPage(tk.Frame):
         self.YearCombo = ttk.Combobox(self, values = [str(i-1) + '-' + str(i)[-2:] for i in range(datetime.now().year+1, 2010, -1)])
         self.YearCombo.grid(column=1, row=2)
 
-        self.canv = tk.Canvas(self, width=1500, height=700, bg="red")
+        self.canv = tk.Canvas(self, width=1500, height=650, bg="red")
         self.canv.grid(column=0, row=5, columnspan=15)
 
         scrollbar = ttk.Scrollbar(self, orient='vertical', command=self.canv.yview)
@@ -124,15 +124,15 @@ class TransactionPage(tk.Frame):
             self.lbl[1][i] = tk.Label(self.frame, text= self.report[i]['ISIN Code'])
             self.lbl[1][i].grid(column=1, row=1+i)
             self.lbl[2][i] = tk.Label(self.frame, text= self.report[i]['Company Name'])
-            self.lbl[2][i].grid(column=2, row=1+i)
+            self.lbl[2][i].grid(column=2, row=1+i, sticky = tk.W)
             self.lbl[3][i] = tk.Label(self.frame, text= self.report[i]['Quantity'])
-            self.lbl[3][i].grid(column=3, row=1+i)
+            self.lbl[3][i].grid(column=3, row=1+i, sticky = tk.E)
             self.lbl[4][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Unit Price']))
-            self.lbl[4][i].grid(column=4, row=1+i)
-            self.lbl[5][i] = tk.Label(self.frame, text= self.report[i]['Amount'])
-            self.lbl[5][i].grid(column=5, row=1+i)
+            self.lbl[4][i].grid(column=4, row=1+i, sticky = tk.E)
+            self.lbl[5][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Amount']))
+            self.lbl[5][i].grid(column=5, row=1+i, sticky = tk.E)
             self.lbl[6][i] = tk.Label(self.frame, text= self.report[i]['Total Quantity'])
-            self.lbl[6][i].grid(column=6, row=1+i)
+            self.lbl[6][i].grid(column=6, row=1+i, sticky = tk.E)
         self.canv.focus_set()
 
     def updateAcclist(self):
@@ -158,6 +158,6 @@ class TransactionPage(tk.Frame):
 
     def accTransExp(self):
         data = DAO.accountTransactions(self.AccountCombo.get())
-        data = [["Date", "Type",	"ISIN",	"Total (qty)",	"Total Amount"]] + [[d.date, d.transType, d.company.isinCode, d.quantity, d.amount] for d in data]
+        data = [["Date", "Type",	"ISIN",	"Total (qty)",	"Total Amount", "Company Name"]] + [[d.date, d.transType, d.company.isinCode, d.quantity, d.amount, d.company.companyName] for d in data]
         rep = pd.DataFrame(data)
         rep.to_csv("..\\reports\\"+ self.AccountCombo.get() + "AccountTransactions" + str(datetime.now().strftime("%Y%m%d%H%M%S")) + ".csv", header=False, index=False)

@@ -71,7 +71,7 @@ class Account:
 
     def clearTransactions(self):
         self.transactions.clear()
-        self.companiesInHolding.clear()
+        # self.companiesInHolding.clear()
 
     def importTransactions(self, fileName:str):
         self.clearTransactions()

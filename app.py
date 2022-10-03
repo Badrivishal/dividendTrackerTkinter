@@ -46,6 +46,9 @@ class MyApp(tk.Tk):
 
 
 if __name__ == "__main__":
-    DAO.updateCompanyList()
+    try:
+        DAO.updateCompanyList()
+    except:
+        pass
     app = MyApp()
     app.mainloop()
