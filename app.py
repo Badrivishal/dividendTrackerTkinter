@@ -12,6 +12,8 @@ class MyApp(tk.Tk):
 
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
+        self.title("Dividend Tracker")
+        self.iconbitmap("AppIcon.ico")
         # self.attributes('-fullscreen',True)
 
         self.title_font = tkfont.Font(family='Helvetica', size=25, weight="bold", slant="italic")

@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import messagebox as tkMessageBox
 from tkinter import filedialog as fd
 from tkinter import ttk
+from turtle import bgcolor
 from click import command
 from application import *
 from pageOne import *
@@ -20,7 +21,7 @@ class TransactionPage(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        transactionModeTitlelbl = tk.Label(self, text = "Transaction Mode")
+        transactionModeTitlelbl = tk.Label(self, text = "Transaction Mode",font='Helvetica 16 bold')
         transactionModeTitlelbl.grid(column = 0, row = 0, columnspan = 12)
         
         dividendModebutton = tk.Button(self, text="Dividend Mode",
@@ -47,13 +48,13 @@ class TransactionPage(tk.Frame):
                            command=self.exportReportButton)
         button.grid(column=7, row=2)
 
-        button = tk.Button(self, text="Reset",
-                           command=self.reset)
-        button.grid(column=8, row=2)
+        # button = tk.Button(self, text="Reset",
+        #                    command=self.reset)
+        # button.grid(column=8, row=2)
 
         button = tk.Button(self, text="Account Transactions Export",
                            command=self.accTransExp)
-        button.grid(column=9, row=2)
+        button.grid(column=8, row=2)
 
         Acclbl = tk.Label(self, text = "Accounts:")
         Acclbl.grid(column=0, row=1)
@@ -67,8 +68,8 @@ class TransactionPage(tk.Frame):
         self.YearCombo = ttk.Combobox(self, values = [str(i-1) + '-' + str(i)[-2:] for i in range(datetime.now().year+1, 2010, -1)])
         self.YearCombo.grid(column=1, row=2)
 
-        self.canv = tk.Canvas(self, width=1500, height=650, bg="red")
-        self.canv.grid(column=0, row=5, columnspan=15)
+        self.canv = tk.Canvas(self, width=1500, height=600, bg="red")
+        self.canv.grid(column=0, row=5, columnspan=16)
 
         scrollbar = ttk.Scrollbar(self, orient='vertical', command=self.canv.yview)
         scrollbar.grid(row=5, column=16, sticky=tk.NS)
@@ -111,29 +112,34 @@ class TransactionPage(tk.Frame):
     def genAccTransReportButton(self):
         # print(self.replen)
         # print(len(self.lbl[0]))
-        for i in range(self.replen):
-            for j in range(7):
-                self.lbl[j][i].destroy()
+        accountSelected = self.AccountCombo.get()
+        yearSelected = self.YearCombo.get()
+        if accountSelected != '' or yearSelected != '':
+            for i in range(self.replen):
+                for j in range(7):
+                    self.lbl[j][i].destroy()
 
-        self.report = genAccTransReport(DAO.getAccount(self.AccountCombo.get()), int("20"+self.YearCombo.get()[-2:]))
-        self.replen = len(self.report)
-        
-        for i in range(len(self.report)):
-            self.lbl[0][i] = tk.Label(self.frame, text= datetime.strptime(str(self.report[i]['Date']), '%Y%m%d').strftime("%d/%m/%y") if int(self.report[i]['Date']) !=0 else "00000000")
-            self.lbl[0][i].grid(column=0, row=1+i)
-            self.lbl[1][i] = tk.Label(self.frame, text= self.report[i]['ISIN Code'])
-            self.lbl[1][i].grid(column=1, row=1+i)
-            self.lbl[2][i] = tk.Label(self.frame, text= self.report[i]['Company Name'])
-            self.lbl[2][i].grid(column=2, row=1+i, sticky = tk.W)
-            self.lbl[3][i] = tk.Label(self.frame, text= self.report[i]['Quantity'])
-            self.lbl[3][i].grid(column=3, row=1+i, sticky = tk.E)
-            self.lbl[4][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Unit Price']))
-            self.lbl[4][i].grid(column=4, row=1+i, sticky = tk.E)
-            self.lbl[5][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Amount']))
-            self.lbl[5][i].grid(column=5, row=1+i, sticky = tk.E)
-            self.lbl[6][i] = tk.Label(self.frame, text= self.report[i]['Total Quantity'])
-            self.lbl[6][i].grid(column=6, row=1+i, sticky = tk.E)
-        self.canv.focus_set()
+            self.report = genAccTransReport(DAO.getAccount(accountSelected), int("20"+yearSelected[-2:]))
+            self.replen = len(self.report)
+            
+            for i in range(len(self.report)):
+                self.lbl[0][i] = tk.Label(self.frame, text= datetime.strptime(str(self.report[i]['Date']), '%Y%m%d').strftime("%d/%m/%y") if int(self.report[i]['Date']) !=0 else "00000000")
+                self.lbl[0][i].grid(column=0, row=1+i)
+                self.lbl[1][i] = tk.Label(self.frame, text= self.report[i]['ISIN Code'])
+                self.lbl[1][i].grid(column=1, row=1+i)
+                self.lbl[2][i] = tk.Label(self.frame, text= self.report[i]['Company Name'])
+                self.lbl[2][i].grid(column=2, row=1+i, sticky = tk.W)
+                self.lbl[3][i] = tk.Label(self.frame, text= self.report[i]['Quantity'])
+                self.lbl[3][i].grid(column=3, row=1+i, sticky = tk.E)
+                self.lbl[4][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Unit Price']))
+                self.lbl[4][i].grid(column=4, row=1+i, sticky = tk.E)
+                self.lbl[5][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Amount']))
+                self.lbl[5][i].grid(column=5, row=1+i, sticky = tk.E)
+                self.lbl[6][i] = tk.Label(self.frame, text= self.report[i]['Total Quantity'])
+                self.lbl[6][i].grid(column=6, row=1+i, sticky = tk.E)
+            self.canv.focus_set()
+        else:
+            tkMessageBox.showerror("Error","Please Select Account And Year to generate the Report")
 
     def updateAcclist(self):
         acclist = DAO.getAccountList()
@@ -143,13 +149,13 @@ class TransactionPage(tk.Frame):
         filename = fd.askopenfilename()
         failed = DAO.importTransAcc(self.AccountCombo.get(), filename)
         if len(failed) == 0:
-            tkMessageBox.showinfo("Information","All the transactions were imported to the account ", self.AccountCombo.get())
+            tkMessageBox.showinfo("Information","All the transactions were successfully imported to the account "+ self.AccountCombo.get())
         else:
             tkMessageBox.showinfo("Information","Please check the isin Numbers: " + ", ".join(failed))
 
-    def reset(self):
-        if(tkMessageBox.askquestion("askquestion", "Are you sure?") == "yes"):
-            DAO.reset()
+    # def reset(self):
+        # if(tkMessageBox.askquestion("Reset", "All the Accounts and the Corresponding transactions will be deleted \n\n Are you sure you want to reset?") == "yes"):
+            # DAO.reset()
         
 
     def exportReportButton(self):

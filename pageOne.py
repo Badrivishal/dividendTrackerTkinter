@@ -19,7 +19,7 @@ class PageOne(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        lbl = tk.Label(self, text = "Dividend Mode")
+        lbl = tk.Label(self, text = "Dividend Mode", font='Helvetica 16 bold')
         lbl.grid(column = 0, row = 0, columnspan = 12)
         
         button = tk.Button(self, text="Transaction Mode",
@@ -46,7 +46,7 @@ class PageOne(tk.Frame):
         self.YearCombo = ttk.Combobox(self, values = [str(i-1) + '-' + str(i)[-2:] for i in range(datetime.now().year+1, 2010, -1)])
         self.YearCombo.grid(column=1, row=2)
 
-        self.canv = tk.Canvas(self, width=1500, height=650,  bg="red")
+        self.canv = tk.Canvas(self, width=1500, height=600,  bg="red")
         self.canv.grid(column=0, row=5, columnspan=16)
 
         scrollbar = ttk.Scrollbar(self, orient='vertical', command=self.canv.yview)
@@ -135,8 +135,29 @@ class PageOne(tk.Frame):
             self.lbl[10][i] = tk.Button(self.frame, text="Add Recieved Note",
                            command=lambda val=i: self.AddRecievedNote(val))
             self.lbl[10][i].grid(column=10, row=5+i)
+        # print([i['Recieved Amount'] for i in self.report if len(str(i['Recieved Amount']))!=0])
+        lbl = tk.Label(self, text="Total Dividend Amount Declared(In terms of Recieved): ")
+        lbl.grid(column=0, row=6, columnspan=2)
+        self.total_div_lbl = tk.Label(self, text=str(sum([float(i['Dividend Amount']) for i in self.report if len(str(i['Recieved Date']))!=0])))
+        self.total_div_lbl.grid(column=2, row=6, sticky=tk.E)
+        
+        lbl = tk.Label(self, text="Total Recieved Amount: ")
+        lbl.grid(column=0, row=7, columnspan=2)
+        self.total_lbl = tk.Label(self, text=str(sum([float(i['Recieved Amount']) for i in self.report if len(str(i['Recieved Date']))!=0])))
+        self.total_lbl.grid(column=2, row=7, sticky=tk.E)
+        
+        lbl = tk.Label(self, text="Total Tax Amount Paid(In terms of Recieved): ")
+        lbl.grid(column=0, row=8, columnspan=2)
+        self.total_tax_lbl = tk.Label(self, text=str(float(self.total_div_lbl['text']) - float(self.total_lbl['text'])))
+        self.total_tax_lbl.grid(column=2, row=8, sticky=tk.E)
+
+        lbl = tk.Label(self, text="Total Dividend Amount to be recieved")
+        lbl.grid(column=5, row=6, columnspan=2)
+        self.total_unrecieved_div_lbl = tk.Label(self, text=str(sum([float(i['Dividend Amount']) for i in self.report if len(str(i['Recieved Date']))==0])))
+        self.total_unrecieved_div_lbl.grid(column=7, row=6, sticky=tk.E)
+        
         self.canv.focus_set()
-    
+        
     def updateAcclist(self):
         acclist = DAO.getAccountList()
         self.AccountCombo['values'] = acclist
@@ -178,7 +199,12 @@ class PageOne(tk.Frame):
         self.lbl[7][row].grid(column=7, row=5+row, sticky = tk.E)
         # print(type(self.report[row]['Recieved Date']), type(self.report[row]['Recieved Amount']))
         self.report[row]['Recieved Date'] = date
-        self.report[row]['Recieved Date'] = amount
+        self.report[row]['Recieved Amount'] = amount
+        self.total_div_lbl['text'] = str(sum([float(i['Dividend Amount']) for i in self.report if len(str(i['Recieved Date']))!=0]))
+        self.total_lbl['text'] = str(sum([float(i['Recieved Amount']) for i in self.report if len(str(i['Recieved Amount']))!=0]))
+        self.total_tax_lbl['text'] =str(float(self.total_div_lbl['text']) - float(self.total_lbl['text']))
+        self.total_unrecieved_div_lbl['text']=str(sum([float(i['Dividend Amount']) for i in self.report if len(str(i['Recieved Date']))==0]))
+
         pop.destroy()
 
 

@@ -14,6 +14,7 @@ class NewTransaction(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
+        self.companyList = DAO.getCompanyList()
 
         button = tk.Button(self, text="Back",command=lambda: controller.show_frame("TransactionPage"))
         button.grid(column=0, row=0)
@@ -41,8 +42,9 @@ class NewTransaction(tk.Frame):
         self.AccountCombo = ttk.Combobox(self, postcommand = self.updateAcclist)
         self.AccountCombo.grid(column=1, row=2)
         # lbl2.grid(column=1, row=2)
-        self.CompanyCombo = AutocompleteCombobox(self, completevalues = DAO.getCompanyList(), width=50)
+        self.CompanyCombo = ttk.Combobox(self, values = self.companyList, width=50)
         self.CompanyCombo.grid(column=1, row=3)
+        self.CompanyCombo.bind('<KeyRelease>', self.companySearch)
         self.TransTypeCombo = ttk.Combobox(self, values=["Opening Balance", "Purchase", "Sale"])
         self.TransTypeCombo.grid(column=1, row=4)
         self.quantityField = tk.Entry(self)
@@ -70,3 +72,16 @@ class NewTransaction(tk.Frame):
         DAO.newTransaction(self.AccountCombo.get(), dt.strftime("%Y%m%d"), float(self.accountField.get()), int(self.quantityField.get()), self.TransTypeCombo.get(), self.CompanyCombo.get())
         tkMessageBox.showinfo("Information","New Transaction was Added")
         self.controller.show_frame("TransactionPage")
+
+    def companySearch(self, event):
+        # pass
+        value = event.widget.get()
+        if value == '':
+            self.CompanyCombo['value'] = self.companyList
+        else:
+            _hit = []
+            for element in self.companyList:
+                if value.lower() in element.lower():  # Match case insensitively
+                    _hit.append(element)
+            self.CompanyCombo['value'] = _hit
+            
