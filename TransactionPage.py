@@ -146,13 +146,16 @@ class TransactionPage(tk.Frame):
         self.AccountCombo['values'] = acclist
 
     def importTransButton(self):
-        filename = fd.askopenfilename()
-        failed = DAO.importTransAcc(self.AccountCombo.get(), filename)
-        if len(failed) == 0:
-            tkMessageBox.showinfo("Information","All the transactions were successfully imported to the account "+ self.AccountCombo.get())
+        accountSelected = self.AccountCombo.get()
+        if accountSelected != '':
+            filename = fd.askopenfilename()
+            failed = DAO.importTransAcc(accountSelected, filename)
+            if len(failed) == 0:
+                tkMessageBox.showinfo("Information","All the transactions were successfully imported to the account "+ self.AccountCombo.get())
+            else:
+                tkMessageBox.showinfo("Information","Please check the isin Numbers: " + ", ".join(failed))
         else:
-            tkMessageBox.showinfo("Information","Please check the isin Numbers: " + ", ".join(failed))
-
+            tkMessageBox.showerror("Error","Please Select Account to which you want to import the transactions to")
     # def reset(self):
         # if(tkMessageBox.askquestion("Reset", "All the Accounts and the Corresponding transactions will be deleted \n\n Are you sure you want to reset?") == "yes"):
             # DAO.reset()
