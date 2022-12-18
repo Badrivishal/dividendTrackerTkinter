@@ -22,7 +22,7 @@ class TransactionPage(tk.Frame):
         self.controller = controller
 
         transactionModeTitlelbl = tk.Label(self, text = "Transaction Mode",font='Helvetica 16 bold')
-        transactionModeTitlelbl.grid(column = 0, row = 0, columnspan = 12)
+        transactionModeTitlelbl.grid(column = 0, row = 0, columnspan = 100)
         
         dividendModebutton = tk.Button(self, text="Dividend Mode",
                            command=lambda: controller.show_frame("PageOne"))

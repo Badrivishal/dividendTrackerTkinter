@@ -50,6 +50,7 @@ class MyApp(tk.Tk):
 if __name__ == "__main__":
     try:
         DAO.updateCompanyList()
+        DAO.importDividendsForAll()
     except:
         pass
     app = MyApp()

@@ -105,10 +105,21 @@ class PageOne(tk.Frame):
             
             account = DAO.getAccount(accountSelected)
             finYear = int("20"+yearSelected[-2:])
-            account = importDividends(account, finYear)
+            # account = importDividends(account, finYear)
+            
+            if datetime.now().month < 4:
+                year = datetime.now().year
+            else:
+                year = datetime.now().year+1
+
+            if finYear != year:
+                account = importDividends(account, finYear)
+                DAO.updateAccountDiv(accountSelected,  account)
+
+
             # print("Updating------------------")
             
-            DAO.updateAccountDiv(accountSelected,  account)
+            # DAO.updateAccountDiv(accountSelected,  account)
             # print("Updatedddddddd===============================")
             self.report = genAccDividendReport(account, finYear)
             self.replen = len(self.report)
@@ -179,12 +190,14 @@ class PageOne(tk.Frame):
         dateField=DateEntry(pop,selectmode='day',date_pattern='dd-mm-yyyy')        
 
         dateField.grid(column=1, row=1)
-        accountField = tk.Entry(pop)
-        accountField.insert(0, "{:.2f}".format(self.report[val]['Final Amount']))
-        accountField.grid(column=1, row=2)
+        amountField = tk.Entry(pop)
+        amountField.insert(0, "{:.2f}".format(self.report[val]['Final Amount']))
+        amountField.grid(column=1, row=2)
         button = tk.Button(pop, text="Submit",
-                           command=lambda: self.updateRecieved(self.report[val]['Id'], dateField.get_date().strftime("%Y%m%d"), accountField.get(), val))
+                           command=lambda: self.updateRecieved(self.report[val]['Id'], dateField.get_date().strftime("%Y%m%d"), amountField.get(), val))
         button.grid(column=1, row=3)
+
+        
         
     
     def updateRecieved(self, uid, date, amount, row):

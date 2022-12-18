@@ -2,6 +2,7 @@ import pandas as pd
 import requests
 import math
 import pickle
+import datetime
 
 from sympy import re
 
@@ -139,7 +140,7 @@ def importCompanies():
 def importDividends(acc:Account, year):
     queryParams = {'Fdate': str(year-1) + '0401',
     'Purposecode': 'P9',
-    'TDate': str(year) + '0331',
+    'TDate': datetime.date.today().__sub__(datetime.timedelta(1)).strftime("%Y%m%d"),
     'ddlcategorys': 'E',
     'ddlindustrys':'',
     'scripcode':'',
