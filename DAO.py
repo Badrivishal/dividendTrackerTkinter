@@ -117,11 +117,13 @@ def importDividendsForAll():
     else:
         year = datetime.date.today().year+1
     
-    accountList = getAccountList()
-    for name in accountList:
-        acc = database[name]
-        importDividends(acc, year)
-        database[name] = acc
+    importDividends(database, year)
+    # print(type(database))
+    # accountList = getAccountList()
+    # for name in accountList:
+    #     acc = database[name]
+    #     importDividends(acc, year)
+    #     database[name] = acc
     
     with open('data.pkl', 'wb') as f:
         pickle.dump(database, f)

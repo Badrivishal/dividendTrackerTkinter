@@ -45,6 +45,13 @@ class PageOne(tk.Frame):
         self.YearCombo = ttk.Combobox(self, values = [str(i-1) + '-' + str(i)[-2:] for i in range(datetime.now().year+1, 2010, -1)])
         self.YearCombo.grid(column=1, row=2)
 
+        searchLabel = tk.Label(self, text = "Search:")
+        searchLabel.grid(column=7, row=2, sticky = tk.E)
+
+        self.searchBox = tk.Entry(self)
+        self.searchBox.grid(column=8, row=2)
+        self.searchBox.bind('<Return>', self.updateReport)
+
         self.canv = tk.Canvas(self, width=1500, height=600,  bg="red")
         self.canv.grid(column=0, row=5, columnspan=16)
 
@@ -99,9 +106,9 @@ class PageOne(tk.Frame):
         accountSelected = self.AccountCombo.get()
         yearSelected = self.YearCombo.get()
         if accountSelected != '' or yearSelected != '':
-            for i in range(self.replen):
-                for j in range(11):
-                    self.lbl[j][i].destroy()
+            # for i in range(self.replen):
+            #     for j in range(11):
+            #         self.lbl[j][i].destroy()
             
             account = DAO.getAccount(accountSelected)
             finYear = int("20"+yearSelected[-2:])
@@ -113,6 +120,7 @@ class PageOne(tk.Frame):
                 year = datetime.now().year+1
 
             if finYear != year:
+                # TODO change this to work with dictionary
                 account = importDividends(account, finYear)
                 DAO.updateAccountDiv(accountSelected,  account)
 
@@ -121,33 +129,35 @@ class PageOne(tk.Frame):
             
             # DAO.updateAccountDiv(accountSelected,  account)
             # print("Updatedddddddd===============================")
-            self.report = genAccDividendReport(account, finYear)
-            self.replen = len(self.report)
+            self.globalreport = genAccDividendReport(account, finYear)
+            self.report = self.globalreport.copy()
+            self.updateTable()
+            # self.replen = len(self.report)
             
-            for i in range(len(self.report)):
-                self.lbl[0][i] = tk.Label(self.frame, text= datetime.strptime(str(self.report[i]['Date']), '%Y%m%d').strftime("%d/%m/%y"))
-                self.lbl[0][i].grid(column=0, row=5+i)
-                self.lbl[1][i] = tk.Label(self.frame, text= self.report[i]['ISIN Code'])
-                self.lbl[1][i].grid(column=1, row=5+i)
-                self.lbl[2][i] = tk.Label(self.frame, text= self.report[i]['Company Name'])
-                self.lbl[2][i].grid(column=2, row=5+i, sticky = tk.W)
-                self.lbl[3][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Dividend Declared']))
-                self.lbl[3][i].grid(column=3, row=5+i, sticky = tk.E)
-                self.lbl[4][i] = tk.Label(self.frame, text= self.report[i]['Quantity'])
-                self.lbl[4][i].grid(column=4, row=5+i, sticky = tk.E)
-                self.lbl[5][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Dividend Amount']))
-                self.lbl[5][i].grid(column=5, row=5+i, sticky = tk.E)
-                self.lbl[6][i] = tk.Label(self.frame, text= datetime.strptime(str(self.report[i]['Recieved Date']), '%Y%m%d').strftime("%d/%m/%y") if len(str(self.report[i]['Recieved Date'])) > 1 else "")
-                self.lbl[6][i].grid(column=6, row=5+i)
-                self.lbl[7][i] = tk.Label(self.frame, text= "{:.2f}".format(float(self.report[i]['Recieved Amount'])))
-                self.lbl[7][i].grid(column=7, row=5+i, sticky = tk.E)
-                self.lbl[8][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Tax Amount']))
-                self.lbl[8][i].grid(column=8, row=5+i, sticky = tk.E)
-                self.lbl[9][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Final Amount']))
-                self.lbl[9][i].grid(column=9, row=5+i, sticky = tk.E)
-                self.lbl[10][i] = tk.Button(self.frame, text="Add Recieved Note",
-                            command=lambda val=i: self.AddRecievedNote(val))
-                self.lbl[10][i].grid(column=10, row=5+i)
+            # for i in range(len(self.report)):
+            #     self.lbl[0][i] = tk.Label(self.frame, text= datetime.strptime(str(self.report[i]['Date']), '%Y%m%d').strftime("%d/%m/%y"))
+            #     self.lbl[0][i].grid(column=0, row=5+i)
+            #     self.lbl[1][i] = tk.Label(self.frame, text= self.report[i]['ISIN Code'])
+            #     self.lbl[1][i].grid(column=1, row=5+i)
+            #     self.lbl[2][i] = tk.Label(self.frame, text= self.report[i]['Company Name'])
+            #     self.lbl[2][i].grid(column=2, row=5+i, sticky = tk.W)
+            #     self.lbl[3][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Dividend Declared']))
+            #     self.lbl[3][i].grid(column=3, row=5+i, sticky = tk.E)
+            #     self.lbl[4][i] = tk.Label(self.frame, text= self.report[i]['Quantity'])
+            #     self.lbl[4][i].grid(column=4, row=5+i, sticky = tk.E)
+            #     self.lbl[5][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Dividend Amount']))
+            #     self.lbl[5][i].grid(column=5, row=5+i, sticky = tk.E)
+            #     self.lbl[6][i] = tk.Label(self.frame, text= datetime.strptime(str(self.report[i]['Recieved Date']), '%Y%m%d').strftime("%d/%m/%y") if len(str(self.report[i]['Recieved Date'])) > 1 else "")
+            #     self.lbl[6][i].grid(column=6, row=5+i)
+            #     self.lbl[7][i] = tk.Label(self.frame, text= "{:.2f}".format(float(self.report[i]['Recieved Amount'])))
+            #     self.lbl[7][i].grid(column=7, row=5+i, sticky = tk.E)
+            #     self.lbl[8][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Tax Amount']))
+            #     self.lbl[8][i].grid(column=8, row=5+i, sticky = tk.E)
+            #     self.lbl[9][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Final Amount']))
+            #     self.lbl[9][i].grid(column=9, row=5+i, sticky = tk.E)
+            #     self.lbl[10][i] = tk.Button(self.frame, text="Add Recieved Note",
+            #                 command=lambda val=i: self.AddRecievedNote(val))
+            #     self.lbl[10][i].grid(column=10, row=5+i)
             # print([i['Recieved Amount'] for i in self.report if len(str(i['Recieved Amount']))!=0])
             lbl = tk.Label(self, text="Total Dividend Amount Declared(In terms of Recieved): ")
             lbl.grid(column=0, row=6, columnspan=2)
@@ -193,11 +203,68 @@ class PageOne(tk.Frame):
         amountField = tk.Entry(pop)
         amountField.insert(0, "{:.2f}".format(self.report[val]['Final Amount']))
         amountField.grid(column=1, row=2)
+
+        def taxUpdate(a):
+            taxLab['text'] = (str(float(self.report[val]['Dividend Amount']) - float(amountField.get())))
+
+        lab = tk.Label(pop, text= "Tax Amount Paid")
+        lab.grid(row=3, column=0)
+        taxLab = tk.Label(pop, text= str(float(self.report[val]['Dividend Amount']) - float(amountField.get())))
+        taxLab.grid(row=3, column=1)
+        amountField.bind('<Return>', taxUpdate)
+
         button = tk.Button(pop, text="Submit",
                            command=lambda: self.updateRecieved(self.report[val]['Id'], dateField.get_date().strftime("%Y%m%d"), amountField.get(), val))
-        button.grid(column=1, row=3)
+        button.grid(column=1, row=4)
 
+    def updateTable(self):
+        print("hi, updateTable is called")
+        for i in range(self.replen):
+            for j in range(11):
+                self.lbl[j][i].destroy()
+        self.replen = len(self.report)
         
+        for i in range(len(self.report)):
+            self.lbl[0][i] = tk.Label(self.frame, text= datetime.strptime(str(self.report[i]['Date']), '%Y%m%d').strftime("%d/%m/%y"))
+            self.lbl[0][i].grid(column=0, row=5+i)
+            self.lbl[1][i] = tk.Label(self.frame, text= self.report[i]['ISIN Code'])
+            self.lbl[1][i].grid(column=1, row=5+i)
+            self.lbl[2][i] = tk.Label(self.frame, text= self.report[i]['Company Name'])
+            self.lbl[2][i].grid(column=2, row=5+i, sticky = tk.W)
+            self.lbl[3][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Dividend Declared']))
+            self.lbl[3][i].grid(column=3, row=5+i, sticky = tk.E)
+            self.lbl[4][i] = tk.Label(self.frame, text= self.report[i]['Quantity'])
+            self.lbl[4][i].grid(column=4, row=5+i, sticky = tk.E)
+            self.lbl[5][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Dividend Amount']))
+            self.lbl[5][i].grid(column=5, row=5+i, sticky = tk.E)
+            self.lbl[6][i] = tk.Label(self.frame, text= datetime.strptime(str(self.report[i]['Recieved Date']), '%Y%m%d').strftime("%d/%m/%y") if len(str(self.report[i]['Recieved Date'])) > 1 else "")
+            self.lbl[6][i].grid(column=6, row=5+i)
+            self.lbl[7][i] = tk.Label(self.frame, text= "{:.2f}".format(float(self.report[i]['Recieved Amount'])))
+            self.lbl[7][i].grid(column=7, row=5+i, sticky = tk.E)
+            self.lbl[8][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Tax Amount']))
+            self.lbl[8][i].grid(column=8, row=5+i, sticky = tk.E)
+            self.lbl[9][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Final Amount']))
+            self.lbl[9][i].grid(column=9, row=5+i, sticky = tk.E)
+            self.lbl[10][i] = tk.Button(self.frame, text="Add Recieved Note",
+                        command=lambda val=i: self.AddRecievedNote(val))
+            self.lbl[10][i].grid(column=10, row=5+i)
+        
+
+    def updateReport(self, a):
+        # self.globalreport
+        txt = self.searchBox.get()
+        if txt == '':
+            self.report = self.globalreport
+        else:    
+            self.report = []
+            for i in range(len(self.globalreport)):
+                for j in self.globalreport[i].values():
+                    if txt.lower() in str(j).lower():
+                        self.report.append(self.globalreport[i])
+                        break
+        self.updateTable()
+        self.canv.focus_set()
+
         
     
     def updateRecieved(self, uid, date, amount, row):

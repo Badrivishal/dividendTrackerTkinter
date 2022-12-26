@@ -51,7 +51,7 @@ if __name__ == "__main__":
     try:
         DAO.updateCompanyList()
         DAO.importDividendsForAll()
-    except:
-        pass
+    except Exception as e:
+        print("Couldnt Import Dividends", e)
     app = MyApp()
     app.mainloop()

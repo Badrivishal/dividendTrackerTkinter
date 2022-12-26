@@ -137,7 +137,7 @@ def importCompanies():
     return mainCompanyList
     # print(df.head())
 
-def importDividends(acc:Account, year):
+def importDividends(accDict:dict, year):
     queryParams = {'Fdate': str(year-1) + '0401',
     'Purposecode': 'P9',
     'TDate': datetime.date.today().__sub__(datetime.timedelta(1)).strftime("%Y%m%d"),
@@ -165,12 +165,13 @@ def importDividends(acc:Account, year):
     df.drop(['short_name', 'Ex_date', 'long_name', 'RD_Date', 'BCRD_FROM', 'BCRD_TO', 'ND_START_DATE', 'ND_END_DATE', 'payment_date'], axis=1, inplace=True)
     
     for indx, dividend in enumerate(df.to_numpy()):
-        for company in acc.companiesInHolding:
-            if(company.bseCode == dividend[0]):
-                if(dividend[1].find('Rs. - ')!=-1):
-                    div = float(dividend[1].split('Rs. - ')[1])
-                    company.addDividend(Dividend(str(year) + str(indx), dividend[2], div))
-                    break
+        for acc in accDict.values():
+            for company in acc.companiesInHolding:
+                if(company.bseCode == dividend[0]):
+                    if(dividend[1].find('Rs. - ')!=-1):
+                        div = float(dividend[1].split('Rs. - ')[1])
+                        company.addDividend(Dividend(str(year) + str(indx), dividend[2], div))
+                        break
 
     return acc
 
