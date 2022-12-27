@@ -179,6 +179,7 @@ class PageOne(tk.Frame):
             self.total_unrecieved_div_lbl = tk.Label(self, text="{:.2f}".format(sum([float(i['Final Amount']) for i in self.report if len(str(i['Recieved Date']))==0])))
             self.total_unrecieved_div_lbl.grid(column=7, row=6, sticky=tk.E)
             
+            self.canv.yview_moveto(0)
             self.canv.focus_set()
         else:
             tkMessageBox.showerror("Error","Please Select Account And Year to generate the Report")
@@ -216,6 +217,24 @@ class PageOne(tk.Frame):
         button = tk.Button(pop, text="Submit",
                            command=lambda: self.updateRecieved(self.report[val]['Id'], dateField.get_date().strftime("%Y%m%d"), amountField.get(), val))
         button.grid(column=1, row=4)
+
+        delete = tk.Button(pop, text="Delete", command=lambda:self.deleteDiv(self.report[val]['Id'], val))
+        delete.grid(column=2, row=0)
+
+    def deleteDiv(self, uid, row):
+        account = DAO.getAccount(self.AccountCombo.get())
+        # account.
+        for company in account.companiesInHolding:
+            for div in company.dividendsDeclared:
+                if div.uid == uid:
+                    div.recievedDate = ''
+                    div.recievedAmount = 0
+        DAO.updateAccountDiv(account.accountHoldersName, account)
+        self.report[row]['Recieved Date'] = ''
+        self.report[row]['Recieved Amount'] = 0
+        self.updateTable()
+        pop.destroy()
+
 
     def updateTable(self):
         print("hi, updateTable is called")
@@ -263,6 +282,7 @@ class PageOne(tk.Frame):
                         self.report.append(self.globalreport[i])
                         break
         self.updateTable()
+        self.canv.yview_moveto(0)
         self.canv.focus_set()
 
         

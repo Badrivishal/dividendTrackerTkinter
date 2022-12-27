@@ -127,3 +127,13 @@ def importDividendsForAll():
     
     with open('data.pkl', 'wb') as f:
         pickle.dump(database, f)
+
+
+def writeTrans(acc:Account):
+    with open('data.pkl', 'rb') as f:
+        database = pickle.load(f)
+    
+    database[acc.accountHoldersName] = acc
+
+    with open('data.pkl', 'wb') as f:
+        pickle.dump(database, f)

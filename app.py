@@ -5,7 +5,7 @@ from application import *
 from pageOne import *
 from TransactionPage import *
 from NewTransaction import *
-
+from allTransactions import *
 
 
 class MyApp(tk.Tk):
@@ -18,16 +18,13 @@ class MyApp(tk.Tk):
 
         self.title_font = tkfont.Font(family='Helvetica', size=25, weight="bold", slant="italic")
 
-        # the container is where we'll stack a bunch of frames
-        # on top of each other, then the one we want visible
-        # will be raised above the others
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for F in (TransactionPage, PageOne, NewTransaction, NewAccount):
+        for F in (TransactionPage, PageOne, NewTransaction, NewAccount, AllTransactions):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame

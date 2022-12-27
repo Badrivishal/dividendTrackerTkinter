@@ -28,6 +28,11 @@ class TransactionPage(tk.Frame):
                            command=lambda: controller.show_frame("PageOne"))
         dividendModebutton.grid(column=9, row=1)
 
+        allTransModebutton = tk.Button(self, text="Transaction Edit Mode",
+                           command=lambda: controller.show_frame("AllTransactions"))
+        allTransModebutton.grid(column=9, row=2)
+        # allTransModebutton["state"] = "disabled"
+
         newTransactionbutton = tk.Button(self, text="New Transaction",
                            command=lambda: controller.show_frame("NewTransaction"))
         newTransactionbutton.grid(column=8, row=1)
@@ -137,6 +142,7 @@ class TransactionPage(tk.Frame):
                 self.lbl[5][i].grid(column=5, row=1+i, sticky = tk.E)
                 self.lbl[6][i] = tk.Label(self.frame, text= self.report[i]['Total Quantity'])
                 self.lbl[6][i].grid(column=6, row=1+i, sticky = tk.E)
+            self.canv.yview_moveto(0)
             self.canv.focus_set()
         else:
             tkMessageBox.showerror("Error","Please Select Account And Year to generate the Report")
