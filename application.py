@@ -133,14 +133,19 @@ def importCompanies():
         if(br_flag == 0):
             mainCompanyList.append(Company(NSEcompany[1], '', NSEcompany[0], NSEcompany[2]))
 
-    # print(len(mainCompanyList))
     return mainCompanyList
-    # print(df.head())
 
 def importDividends(accDict:dict, year):
+    # Import Dividends takes the whole account database and updates the dividends for the year
+        # I had to add this because, the dividend in the new year was at a diferent index when checking the dividend for the previous year
+        # For Example, 20241 is also the same as 20231025 because the list is generated for 2023 to today, so it will end up having 2 uid's
+        # This will help pull data for each finYear instead of pulling all the data till date.  
+    # tDate = min(int(datetime.date.today().strftime("%Y%m%d")), int(str(year) + '0331'))
+        # This is now no longer needed as the uid is independent of the ascending order problem.
+    
     queryParams = {'Fdate': str(year-1) + '0401',
     'Purposecode': 'P9',
-    'TDate': datetime.date.today().__sub__(datetime.timedelta(1)).strftime("%Y%m%d"),
+    'TDate':str(year) + '0331',
     'ddlcategorys': 'E',
     'ddlindustrys':'',
     'scripcode':'',
@@ -161,7 +166,6 @@ def importDividends(accDict:dict, year):
 
     x = requests.get(url=link, params=queryParams, headers=header)
     df = pd.read_json(x.content)
-    
     df.drop(['short_name', 'Ex_date', 'long_name', 'RD_Date', 'BCRD_FROM', 'BCRD_TO', 'ND_START_DATE', 'ND_END_DATE', 'payment_date'], axis=1, inplace=True)
     
     for indx, dividend in enumerate(df.to_numpy()):
@@ -170,7 +174,8 @@ def importDividends(accDict:dict, year):
                 if(company.bseCode == dividend[0]):
                     if(dividend[1].find('Rs. - ')!=-1):
                         div = float(dividend[1].split('Rs. - ')[1])
-                        company.addDividend(Dividend(str(year) + str(indx), dividend[2], div))
+                        # This makes an id from the 2nd Column and the exDate
+                        company.addDividend(Dividend(str(dividend[2]) + dividend[1], dividend[2], div))
                         break
 
     return acc
@@ -284,9 +289,14 @@ def genAccDividendReport(account:Account, finYear:int):
                     row['Tax Amount'] = 0
                     row['Final Amount'] = row['Dividend Amount'] - row['Tax Amount']
                 row['Id'] = dividend.uid
+                if row['Recieved Amount'] != 0:
+                    row['Tax Paid'] = row['Dividend Amount'] - float(row['Recieved Amount'])
+                else:
+                    row['Tax Paid'] = 0 
                 report.append(row)
     # print(len(report))
     report.sort(key=lambda x: int(x['Date']))
+    print(report)
     return report
     
 

@@ -108,22 +108,11 @@ def accountTransactions(accNmae:str):
 
     return database[accNmae].transactions
 
-def importDividendsForAll():
+def importDividendsForAll(year):
     with open('data.pkl', 'rb') as f:
         database = pickle.load(f)
     
-    if datetime.date.today().month < 4:
-        year = datetime.date.today().year
-    else:
-        year = datetime.date.today().year+1
-    
     importDividends(database, year)
-    # print(type(database))
-    # accountList = getAccountList()
-    # for name in accountList:
-    #     acc = database[name]
-    #     importDividends(acc, year)
-    #     database[name] = acc
     
     with open('data.pkl', 'wb') as f:
         pickle.dump(database, f)

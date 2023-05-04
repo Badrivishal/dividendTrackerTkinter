@@ -1,4 +1,5 @@
 import tkinter as tk
+from datetime import date
 from tkinter import font as tkfont
 from NewAccount import *
 from application import *
@@ -35,7 +36,6 @@ class MyApp(tk.Tk):
             frame.grid(row=0, column=0, sticky="nsew")
 
         self.show_frame("TransactionPage")
-        # frame.tkraise()
 
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''
@@ -47,7 +47,11 @@ class MyApp(tk.Tk):
 if __name__ == "__main__":
     try:
         DAO.updateCompanyList()
-        DAO.importDividendsForAll()
+        if date.today().month < 4:
+            year = date.today().year
+        else:
+            year = date.today().year+1
+        DAO.importDividendsForAll(year)
     except Exception as e:
         print("Couldnt Import Dividends", e)
     app = MyApp()

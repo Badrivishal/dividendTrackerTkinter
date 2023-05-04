@@ -12,8 +12,8 @@ from tkcalendar import DateEntry
 class PageOne(tk.Frame):
 
     replen = 0
-
-    lbl = [['' for i in range(1000)] for i in range(11)]
+    report = []
+    lbl = [['' for i in range(1000)] for i in range(12)]
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -70,7 +70,18 @@ class PageOne(tk.Frame):
         self.canv.bind("<Up>",    lambda event: self.canv.yview_scroll(-1, "units"))
         self.canv.bind("<Down>",  lambda event: self.canv.yview_scroll( 1, "units"))
 
+        self.total_div_lbl = tk.Label(self, text="{:.2f}".format(sum([float(i['Dividend Amount']) for i in self.report if len(str(i['Recieved Date']))!=0])))
+        self.total_div_lbl.grid(column=2, row=6, sticky=tk.E)
+        
+        self.total_lbl = tk.Label(self, text="{:.2f}".format(sum([float(i['Recieved Amount']) for i in self.report if len(str(i['Recieved Date']))!=0])))
+        self.total_lbl.grid(column=2, row=7, sticky=tk.E)
 
+        self.total_tax_lbl = tk.Label(self, text="{:.2f}".format(float(self.total_div_lbl['text']) - float(self.total_lbl['text'])))
+        self.total_tax_lbl.grid(column=2, row=8, sticky=tk.E)
+
+        self.total_unrecieved_div_lbl = tk.Label(self, text="{:.2f}".format(sum([float(i['Final Amount']) for i in self.report if len(str(i['Recieved Date']))==0])))
+        self.total_unrecieved_div_lbl.grid(column=7, row=6, sticky=tk.E)
+        
 
         lbl = tk.Label(self.frame, text = "Date")
         lbl.grid(column=0, row=4)
@@ -84,16 +95,18 @@ class PageOne(tk.Frame):
         lbl.grid(column=4, row=4)
         lbl = tk.Label(self.frame, text = "Dividend Amount")
         lbl.grid(column=5, row=4)
-        lbl = tk.Label(self.frame, text = "Recieved Date")
-        lbl.grid(column=6, row=4)
-        lbl = tk.Label(self.frame, text = "Recieved Amount")
-        lbl.grid(column=7, row=4)
         lbl = tk.Label(self.frame, text = "Tax Amount")
-        lbl.grid(column=8, row=4)
+        lbl.grid(column=6, row=4)
         lbl = tk.Label(self.frame, text = "Final Amount")
+        lbl.grid(column=7, row=4)
+        lbl = tk.Label(self.frame, text = "Recieved Date")
+        lbl.grid(column=8, row=4)
+        lbl = tk.Label(self.frame, text = "Tax Paid")
         lbl.grid(column=9, row=4)
-        lbl = tk.Label(self.frame, text = "Recv Button")
+        lbl = tk.Label(self.frame, text = "Recieved Amount")
         lbl.grid(column=10, row=4)
+        lbl = tk.Label(self.frame, text = "Recv Button")
+        lbl.grid(column=11, row=4)
 
     def reset_scrollregion(self, event):
         self.canv.configure(scrollregion=self.canv.bbox("all"))
@@ -120,9 +133,12 @@ class PageOne(tk.Frame):
                 year = datetime.now().year+1
 
             if finYear != year:
-                # TODO change this to work with dictionary
-                account = importDividends(account, finYear)
-                DAO.updateAccountDiv(accountSelected,  account)
+                # TODO change this to work with dictionary 
+                # print("hi")
+                # account = {account}
+                # account = importDividends(account, finYear)
+                # DAO.updateAccountDiv(accountSelected,  account)
+                DAO.importDividendsForAll(finYear)
 
 
             # print("Updating------------------")
@@ -159,24 +175,28 @@ class PageOne(tk.Frame):
             #                 command=lambda val=i: self.AddRecievedNote(val))
             #     self.lbl[10][i].grid(column=10, row=5+i)
             # print([i['Recieved Amount'] for i in self.report if len(str(i['Recieved Amount']))!=0])
+            # self.total_div_lbl.destroy()
             lbl = tk.Label(self, text="Total Dividend Amount Declared(In terms of Recieved): ")
             lbl.grid(column=0, row=6, columnspan=2)
-            self.total_div_lbl = tk.Label(self, text="{:.2f}".format(sum([float(i['Dividend Amount']) for i in self.report if len(str(i['Recieved Date']))!=0])))
+            self.total_div_lbl['text']="{:.2f}".format(sum([float(i['Dividend Amount']) for i in self.report if len(str(i['Recieved Date']))!=0]))
             self.total_div_lbl.grid(column=2, row=6, sticky=tk.E)
             
+            # self.total_lbl.destroy()
             lbl = tk.Label(self, text="Total Recieved Amount: ")
             lbl.grid(column=0, row=7, columnspan=2)
-            self.total_lbl = tk.Label(self, text="{:.2f}".format(sum([float(i['Recieved Amount']) for i in self.report if len(str(i['Recieved Date']))!=0])))
+            self.total_lbl['text']="{:.2f}".format(sum([float(i['Recieved Amount']) for i in self.report if len(str(i['Recieved Date']))!=0]))
             self.total_lbl.grid(column=2, row=7, sticky=tk.E)
             
+            # self.total_tax_lbl.destroy()
             lbl = tk.Label(self, text="Total Tax Amount Paid(In terms of Recieved): ")
             lbl.grid(column=0, row=8, columnspan=2)
-            self.total_tax_lbl = tk.Label(self, text="{:.2f}".format(float(self.total_div_lbl['text']) - float(self.total_lbl['text'])))
+            self.total_tax_lbl['text']="{:.2f}".format(float(self.total_div_lbl['text']) - float(self.total_lbl['text']))
             self.total_tax_lbl.grid(column=2, row=8, sticky=tk.E)
 
+            # self.total_unrecieved_div_lbl.destroy() 
             lbl = tk.Label(self, text="Total Amount to be recieved")
             lbl.grid(column=5, row=6, columnspan=2)
-            self.total_unrecieved_div_lbl = tk.Label(self, text="{:.2f}".format(sum([float(i['Final Amount']) for i in self.report if len(str(i['Recieved Date']))==0])))
+            self.total_unrecieved_div_lbl['text']="{:.2f}".format(sum([float(i['Final Amount']) for i in self.report if len(str(i['Recieved Date']))==0]))
             self.total_unrecieved_div_lbl.grid(column=7, row=6, sticky=tk.E)
             
             self.canv.yview_moveto(0)
@@ -239,7 +259,7 @@ class PageOne(tk.Frame):
     def updateTable(self):
         print("hi, updateTable is called")
         for i in range(self.replen):
-            for j in range(11):
+            for j in range(12):
                 self.lbl[j][i].destroy()
         self.replen = len(self.report)
         
@@ -256,17 +276,25 @@ class PageOne(tk.Frame):
             self.lbl[4][i].grid(column=4, row=5+i, sticky = tk.E)
             self.lbl[5][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Dividend Amount']))
             self.lbl[5][i].grid(column=5, row=5+i, sticky = tk.E)
-            self.lbl[6][i] = tk.Label(self.frame, text= datetime.strptime(str(self.report[i]['Recieved Date']), '%Y%m%d').strftime("%d/%m/%y") if len(str(self.report[i]['Recieved Date'])) > 1 else "")
-            self.lbl[6][i].grid(column=6, row=5+i)
-            self.lbl[7][i] = tk.Label(self.frame, text= "{:.2f}".format(float(self.report[i]['Recieved Amount'])))
+            self.lbl[6][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Tax Amount']))
+            self.lbl[6][i].grid(column=6, row=5+i, sticky = tk.E)
+            self.lbl[7][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Final Amount']))
             self.lbl[7][i].grid(column=7, row=5+i, sticky = tk.E)
-            self.lbl[8][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Tax Amount']))
-            self.lbl[8][i].grid(column=8, row=5+i, sticky = tk.E)
-            self.lbl[9][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Final Amount']))
+            self.lbl[8][i] = tk.Label(self.frame, text= datetime.strptime(str(self.report[i]['Recieved Date']), '%Y%m%d').strftime("%d/%m/%y") if len(str(self.report[i]['Recieved Date'])) > 1 else "")
+            self.lbl[8][i].grid(column=8, row=5+i)
+            self.lbl[9][i] = tk.Label(self.frame, text= "{:.2f}".format(float(self.report[i]['Tax Paid'])))
             self.lbl[9][i].grid(column=9, row=5+i, sticky = tk.E)
-            self.lbl[10][i] = tk.Button(self.frame, text="Add Recieved Note",
+            self.lbl[10][i] = tk.Label(self.frame, text= "{:.2f}".format(float(self.report[i]['Recieved Amount'])))
+            self.lbl[10][i].grid(column=10, row=5+i, sticky = tk.E)
+            if float(self.report[i]['Recieved Amount']) > self.report[i]['Final Amount'] and float(self.report[i]['Recieved Amount'])!=0:
+                self.lbl[10][i].config(fg = 'white', bg = 'green')
+            elif float(self.report[i]['Recieved Amount']) < self.report[i]['Final Amount'] and float(self.report[i]['Recieved Amount'])!=0:
+                self.lbl[10][i].config(fg = 'white', bg = 'red')
+
+
+            self.lbl[11][i] = tk.Button(self.frame, text="Add Recieved Note",
                         command=lambda val=i: self.AddRecievedNote(val))
-            self.lbl[10][i].grid(column=10, row=5+i)
+            self.lbl[11][i].grid(column=11, row=5+i)
         
 
     def updateReport(self, a):
@@ -296,20 +324,26 @@ class PageOne(tk.Frame):
                 if div.uid == uid:
                     div.update(date, amount)
         DAO.updateAccountDiv(account.accountHoldersName, account)
-        self.lbl[6][row].destroy()
-        self.lbl[7][row].destroy()
-        self.lbl[6][row] = tk.Label(self.frame, text= datetime.strptime(str(date), '%Y%m%d').strftime("%d/%m/%y"))
-        self.lbl[6][row].grid(column=6, row=5+row)
-        self.lbl[7][row] = tk.Label(self.frame, text= "{:.2f}".format(float(amount)))
-        self.lbl[7][row].grid(column=7, row=5+row, sticky = tk.E)
+        # self.lbl[8][row].destroy()
+        # self.lbl[9][row].destroy()
+        # self.lbl[10][row].destroy()
+        # self.lbl[8][row] = tk.Label(self.frame, text= datetime.strptime(str(date), '%Y%m%d').strftime("%d/%m/%y"))
+        # self.lbl[8][row].grid(column=8, row=5+row)
+        # self.lbl[9][row] = tk.Label(self.frame, text= str(float(self.report[row]['Dividend Amount']) - float(amount)))
+        # self.lbl[9][row].grid(column=9, row=5+row, sticky = tk.E)
+        # self.lbl[10][row] = tk.Label(self.frame, text= "{:.2f}".format(float(amount)))
+        # self.lbl[10][row].grid(column=10, row=5+row, sticky = tk.E)
         # print(type(self.report[row]['Recieved Date']), type(self.report[row]['Recieved Amount']))
         self.report[row]['Recieved Date'] = date
         self.report[row]['Recieved Amount'] = amount
+        self.report[row]['Tax Paid'] = float(self.report[row]['Dividend Amount']) - float(amount)
         self.total_div_lbl['text'] = "{:.2f}".format(sum([float(i['Dividend Amount']) for i in self.report if len(str(i['Recieved Date']))!=0]))
         self.total_lbl['text'] = "{:.2f}".format(sum([float(i['Recieved Amount']) for i in self.report if len(str(i['Recieved Amount']))!=0]))
         self.total_tax_lbl['text'] ="{:.2f}".format(float(self.total_div_lbl['text']) - float(self.total_lbl['text']))
         self.total_unrecieved_div_lbl['text']="{:.2f}".format(sum([float(i['Dividend Amount']) for i in self.report if len(str(i['Recieved Date']))==0]))
-
+        self.updateTable()
+        # self.canv.yview_moveto(0)
+        self.canv.focus_set()
         pop.destroy()
 
 
