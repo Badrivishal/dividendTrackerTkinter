@@ -7,6 +7,7 @@ from pageOne import *
 from TransactionPage import *
 from NewTransaction import *
 from allTransactions import *
+from holdings import *
 
 
 class MyApp(tk.Tk):
@@ -25,7 +26,7 @@ class MyApp(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for F in (TransactionPage, PageOne, NewTransaction, NewAccount, AllTransactions):
+        for F in (TransactionPage, PageOne, NewTransaction, NewAccount, AllTransactions, Holdings):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame

@@ -23,7 +23,7 @@ class PageOne(tk.Frame):
         
         button = tk.Button(self, text="Transaction Mode",
                            command=lambda: controller.show_frame("TransactionPage"))
-        button.grid(column=9, row=1)
+        button.grid(column=8, row=1)
 
         button = tk.Button(self, text="Generate Report",
                            command=self.genAccDivReportButton)
@@ -47,6 +47,22 @@ class PageOne(tk.Frame):
 
         searchLabel = tk.Label(self, text = "Search:")
         searchLabel.grid(column=7, row=2, sticky = tk.E)
+
+        fromLabel = tk.Label(self, text="From Date")
+        fromLabel.grid(column=9, row=1)
+
+        toLabel = tk.Label(self, text="To Date")
+        toLabel.grid(column=9, row=2)
+
+        self.fromDate = DateEntry(self, selectmode='day',date_pattern='dd-mm-yyyy')        
+        self.fromDate.grid(column=10, row=1)
+
+        self.toDate = DateEntry(self, selectmode='day',date_pattern='dd-mm-yyyy')        
+        self.toDate.grid(column=10, row=2)
+
+        button = tk.Button(self, text="Export Range Report",
+                           command=self.exportRangeButton)
+        button.grid(column=11, row=1)
 
         self.searchBox = tk.Entry(self)
         self.searchBox.grid(column=8, row=2)
@@ -286,9 +302,9 @@ class PageOne(tk.Frame):
             self.lbl[9][i].grid(column=9, row=5+i, sticky = tk.E)
             self.lbl[10][i] = tk.Label(self.frame, text= "{:.2f}".format(float(self.report[i]['Recieved Amount'])))
             self.lbl[10][i].grid(column=10, row=5+i, sticky = tk.E)
-            if float(self.report[i]['Recieved Amount']) > self.report[i]['Final Amount'] and float(self.report[i]['Recieved Amount'])!=0:
+            if float(self.report[i]['Recieved Amount']) - self.report[i]['Final Amount'] > 0.01 and float(self.report[i]['Recieved Amount'])!=0:
                 self.lbl[10][i].config(fg = 'white', bg = 'green')
-            elif float(self.report[i]['Recieved Amount']) < self.report[i]['Final Amount'] and float(self.report[i]['Recieved Amount'])!=0:
+            elif self.report[i]['Final Amount'] - float(self.report[i]['Recieved Amount'])  > 0.01 and float(self.report[i]['Recieved Amount'])!=0:
                 self.lbl[10][i].config(fg = 'white', bg = 'red')
 
 
@@ -348,5 +364,22 @@ class PageOne(tk.Frame):
 
 
     def exportReportButton(self):
-        rep = pd.DataFrame(self.report)
-        rep.to_csv("..\\reports\\DividendReport" + self.AccountCombo.get() + str(datetime.now().strftime("%Y%m%d%H%M%S")) + ".csv")
+        try:
+            rep = pd.DataFrame(self.report)
+            rep.to_csv("..\\reports\\DividendReport" + self.AccountCombo.get() + str(datetime.now().strftime("%Y%m%d%H%M%S")) + ".csv")
+            tkMessageBox.showinfo("Info","The Dividend Report has been saved to the reports folder")
+        except: 
+            tkMessageBox.showerror("Error","Some Error has Occured")
+
+    def exportRangeButton(self):
+        try:
+            rep = pd.DataFrame(self.report)
+            fr = self.fromDate.get_date().strftime("%Y%m%d")
+            to = self.toDate.get_date().strftime("%Y%m%d")
+            rep = rep[(fr <= rep['Recieved Date']) & (rep['Recieved Date'] <= to)]
+            rep = rep.sort_values(by=['Recieved Date'])
+            rep.to_csv("..\\reports\\DividendReport" + self.AccountCombo.get() + str(datetime.now().strftime("%Y%m%d%H%M%S")) + ".csv")
+            tkMessageBox.showinfo("Info","The Dividend Report has been saved to the reports folder")
+        except:
+            pass
+    

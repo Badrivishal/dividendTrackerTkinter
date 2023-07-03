@@ -11,17 +11,19 @@ import DAO
 
 #TODO https://stackoverflow.com/questions/50422735/tkinter-resize-frame-and-contents-with-main-window
 
-class TransactionPage(tk.Frame):
+class Holdings(tk.Frame):
 
     replen = 0
+    report = []
 
-    lbl = [['' for _ in range(1000)] for _ in range(7)]
+
+    lbl = [['' for _ in range(1000)] for _ in range(8)]
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        transactionModeTitlelbl = tk.Label(self, text = "Transaction Mode",font='Helvetica 16 bold')
+        transactionModeTitlelbl = tk.Label(self, text = "Holdings Mode",font='Helvetica 16 bold')
         transactionModeTitlelbl.grid(column = 0, row = 0, columnspan = 100)
         
         dividendModebutton = tk.Button(self, text="Dividend Mode",
@@ -31,51 +33,41 @@ class TransactionPage(tk.Frame):
         allTransModebutton = tk.Button(self, text="Transaction Edit Mode",
                            command=lambda: controller.show_frame("AllTransactions"))
         allTransModebutton.grid(column=9, row=2)
-
-        holdingsModebutton = tk.Button(self, text="Holdings Mode",
-                           command=lambda: controller.show_frame("Holdings"))
-        holdingsModebutton.grid(column=10, row=1)
         # allTransModebutton["state"] = "disabled"
 
-        newTransactionbutton = tk.Button(self, text="New Transaction",
-                           command=lambda: controller.show_frame("NewTransaction"))
+        newTransactionbutton = tk.Button(self, text="Transaction Mode",
+                           command=lambda: controller.show_frame("TransactionPage"))
         newTransactionbutton.grid(column=8, row=1)
 
-        button = tk.Button(self, text="New Account",
-                           command=lambda: controller.show_frame("NewAccount"))
-        button.grid(column=7, row=1)
+        # button = tk.Button(self, text="New Account",
+        #                    command=lambda: controller.show_frame("NewAccount"))
+        # button.grid(column=7, row=1)
 
         button = tk.Button(self, text="Generate Report",
                            command=self.genAccTransReportButton)
         button.grid(column=6, row=1)
 
-        button = tk.Button(self, text="Import Transactions",
-                           command=self.importTransButton)
-        button.grid(column=6, row=2)
+        # button = tk.Button(self, text="Import Transactions",
+        #                    command=self.importTransButton)
+        # button.grid(column=6, row=2)
 
-        button = tk.Button(self, text="Export Report",
-                           command=self.exportReportButton)
-        button.grid(column=7, row=2)
+        # button = tk.Button(self, text="Export Report",
+        #                    command=self.exportReportButton)
+        # button.grid(column=7, row=2)
 
         # button = tk.Button(self, text="Reset",
         #                    command=self.reset)
         # button.grid(column=8, row=2)
 
-        button = tk.Button(self, text="Account Transactions Export",
-                           command=self.accTransExp)
-        button.grid(column=8, row=2)
+        # button = tk.Button(self, text="Account Transactions Export",
+        #                    command=self.accTransExp)
+        # button.grid(column=8, row=2)
 
         Acclbl = tk.Label(self, text = "Accounts:")
         Acclbl.grid(column=0, row=1)
 
         self.AccountCombo = ttk.Combobox(self, postcommand = self.updateAcclist)
         self.AccountCombo.grid(column=1, row=1)
-
-        Yearlbl = tk.Label(self, text = "Year:")
-        Yearlbl.grid(column=0, row=2)
-
-        self.YearCombo = ttk.Combobox(self, values = [str(i-1) + '-' + str(i)[-2:] for i in range(datetime.now().year+1, 2010, -1)])
-        self.YearCombo.grid(column=1, row=2)
 
         self.canv = tk.Canvas(self, width=1500, height=600, bg="red")
         self.canv.grid(column=0, row=5, columnspan=16)
@@ -95,8 +87,22 @@ class TransactionPage(tk.Frame):
         self.canv.bind("<Up>",    lambda event: self.canv.yview_scroll(-1, "units"))
         self.canv.bind("<Down>",  lambda event: self.canv.yview_scroll( 1, "units"))
 
+        lbl = tk.Label(self, text="Total Holding Value")
+        lbl.grid(column=0, row=6, columnspan=2)
+        self.total_hol_lbl = tk.Label(self, text="{:.2f}".format(sum([float(i['Holding Value']) for i in self.report])))
+        self.total_hol_lbl.grid(column=2, row=6, sticky=tk.E)
+        
+        # self.total_lbl = tk.Label(self, text="{:.2f}".format(sum([float(i['Recieved Amount']) for i in self.report if len(str(i['Recieved Date']))!=0])))
+        # self.total_lbl.grid(column=2, row=7, sticky=tk.E)
 
-        lbl = tk.Label(self.frame, text = "Date")
+        # self.total_tax_lbl = tk.Label(self, text="{:.2f}".format(float(self.total_div_lbl['text']) - float(self.total_lbl['text'])))
+        # self.total_tax_lbl.grid(column=2, row=8, sticky=tk.E)
+
+        # self.total_unrecieved_div_lbl = tk.Label(self, text="{:.2f}".format(sum([float(i['Final Amount']) for i in self.report if len(str(i['Recieved Date']))==0])))
+        # self.total_unrecieved_div_lbl.grid(column=7, row=6, sticky=tk.E)
+
+        
+        lbl = tk.Label(self.frame, text = "S No.")
         lbl.grid(column=0, row=0)
         lbl = tk.Label(self.frame, text = "ISIN Code")
         lbl.grid(column=1, row=0)
@@ -108,8 +114,10 @@ class TransactionPage(tk.Frame):
         lbl.grid(column=4, row=0)
         lbl = tk.Label(self.frame, text = "Amount")
         lbl.grid(column=5, row=0)
-        lbl = tk.Label(self.frame, text = "Total Quantity")
+        lbl = tk.Label(self.frame, text = "Current Value")
         lbl.grid(column=6, row=0)
+        lbl = tk.Label(self.frame, text = "Holding Value")
+        lbl.grid(column=7, row=0)
 
 
     def reset_scrollregion(self, event):
@@ -122,20 +130,21 @@ class TransactionPage(tk.Frame):
         # print(self.replen)
         # print(len(self.lbl[0]))
         accountSelected = self.AccountCombo.get()
-        yearSelected = self.YearCombo.get()
-        if accountSelected != '' or yearSelected != '':
+        # yearSelected = self.YearCombo.get()
+        if accountSelected != '':
             for i in range(self.replen):
-                for j in range(7):
+                for j in range(8):
                     self.lbl[j][i].destroy()
 
-            self.report = genAccTransReport(DAO.getAccount(accountSelected), int("20"+yearSelected[-2:]))
+            self.report = genAccHoldingsReport(DAO.getAccount(accountSelected))
             self.replen = len(self.report)
             
             for i in range(len(self.report)):
-                self.lbl[0][i] = tk.Label(self.frame, text= datetime.strptime(str(self.report[i]['Date']), '%Y%m%d').strftime("%d/%m/%y") if int(self.report[i]['Date']) !=0 else "00000000")
-                self.lbl[0][i].grid(column=0, row=1+i)
+                self.lbl[0][i] = tk.Label(self.frame, text= str(i+1))
+                self.lbl[0][i].grid(column=0, row=1+i, sticky = tk.W)
+
                 self.lbl[1][i] = tk.Label(self.frame, text= self.report[i]['ISIN Code'])
-                self.lbl[1][i].grid(column=1, row=1+i)
+                self.lbl[1][i].grid(column=1, row=1+i, sticky = tk.W)
                 self.lbl[2][i] = tk.Label(self.frame, text= self.report[i]['Company Name'])
                 self.lbl[2][i].grid(column=2, row=1+i, sticky = tk.W)
                 self.lbl[3][i] = tk.Label(self.frame, text= self.report[i]['Quantity'])
@@ -144,10 +153,16 @@ class TransactionPage(tk.Frame):
                 self.lbl[4][i].grid(column=4, row=1+i, sticky = tk.E)
                 self.lbl[5][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Amount']))
                 self.lbl[5][i].grid(column=5, row=1+i, sticky = tk.E)
-                self.lbl[6][i] = tk.Label(self.frame, text= self.report[i]['Total Quantity'])
+                self.lbl[6][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Current Value']))
                 self.lbl[6][i].grid(column=6, row=1+i, sticky = tk.E)
+                self.lbl[7][i] = tk.Label(self.frame, text= "{:.2f}".format(self.report[i]['Holding Value']))
+                self.lbl[7][i].grid(column=7, row=1+i, sticky = tk.E)
+                if float(self.report[i]['Current Value'])==0:
+                    self.lbl[7][i].config(fg = 'white', bg = 'red')
             self.canv.yview_moveto(0)
             self.canv.focus_set()
+            self.total_hol_lbl['text'] = "{:.2f}".format(sum([float(i['Holding Value']) for i in self.report]))
+
         else:
             tkMessageBox.showerror("Error","Please Select Account And Year to generate the Report")
 

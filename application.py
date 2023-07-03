@@ -3,11 +3,15 @@ import requests
 import math
 import pickle
 import datetime
+from bsedata.bse import BSE
 
 from sympy import re
 
 mainCompanyList = []
 tax = 0.1
+bse = BSE()
+bse = BSE(update_codes = True)
+
 class Dividend:
 
     def __init__(self, uid, declaredDate:str = '00000000', dividend:float = 0):
@@ -300,3 +304,43 @@ def genAccDividendReport(account:Account, finYear:int):
     return report
     
 
+def genAccHoldingsReport(account:Account):
+    report = []
+    # totalPrevQuantityPerCompanyDict = {}
+    # totalPrevAmountPerCompanyDict = {}
+
+    totalQuantityPerCompanyDict = {}
+    totalAmountPerCompanyDict = {}
+    currentValueOfCompanyDict = {}
+
+    for trans in account.transactions:
+        try:
+            if(trans.transType == 'Opening Balance'):
+                totalQuantityPerCompanyDict[trans.company.isinCode] = trans.quantity
+                totalAmountPerCompanyDict[trans.company.isinCode] = trans.amount
+            elif(trans.transType == 'Purchase'):
+                totalQuantityPerCompanyDict[trans.company.isinCode] += trans.quantity
+                totalAmountPerCompanyDict[trans.company.isinCode] += trans.amount
+            elif(trans.transType == 'Sale'):
+                totalQuantityPerCompanyDict[trans.company.isinCode] -= trans.quantity
+                totalAmountPerCompanyDict[trans.company.isinCode] -= trans.amount
+        except:
+            totalQuantityPerCompanyDict[trans.company.isinCode] = trans.quantity
+            totalAmountPerCompanyDict[trans.company.isinCode] = trans.amount
+    
+
+    for company in list(totalQuantityPerCompanyDict.keys()):
+        for c in account.companiesInHolding:
+            if c.isinCode == company:
+                company = c
+                try:
+                    currentValueOfCompanyDict[company.isinCode] = float(bse.getQuote(str(company.bseCode))['currentValue'])
+                except:
+                    currentValueOfCompanyDict[company.isinCode] = 0
+                    print("Stock Price Not found for", company.companyName)
+        if totalQuantityPerCompanyDict[company.isinCode]!= 0:
+            report.append({'ISIN Code': company.isinCode, 'BSE Code':company.bseCode, 'NSE Code':company.nseCode, 'Company Name':company.companyName, 'Quantity':totalQuantityPerCompanyDict[company.isinCode], 'Unit Price': totalAmountPerCompanyDict[company.isinCode]/totalQuantityPerCompanyDict[company.isinCode], 'Amount':totalAmountPerCompanyDict[company.isinCode], 'Current Value':float(currentValueOfCompanyDict[company.isinCode]), 'Holding Value':float(currentValueOfCompanyDict[company.isinCode]*totalQuantityPerCompanyDict[company.isinCode])})    
+        report.sort(key=lambda x: x['Company Name'])
+    # for i in report:
+    #     print(i)
+    return report
