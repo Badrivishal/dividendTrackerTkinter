@@ -378,6 +378,11 @@ class PageOne(tk.Frame):
             to = self.toDate.get_date().strftime("%Y%m%d")
             rep = rep[(fr <= rep['Recieved Date']) & (rep['Recieved Date'] <= to)]
             rep = rep.sort_values(by=['Recieved Date'])
+            print(rep)
+            # rep.
+            rep = rep.drop(columns=["Date", "ISIN Code", "BSE Code", "NSE Code", "Tax Amount", "Final Amount", "Id"])
+            rep = rep[["Recieved Date", "Company Name", "Quantity", "Dividend Declared", "Dividend Amount", "Tax Paid", "Recieved Amount"]]
+            # print(rep)
             rep.to_csv("..\\reports\\DividendReport" + self.AccountCombo.get() + str(datetime.now().strftime("%Y%m%d%H%M%S")) + ".csv")
             tkMessageBox.showinfo("Info","The Dividend Report has been saved to the reports folder")
         except:
